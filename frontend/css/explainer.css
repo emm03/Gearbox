@@ -1,0 +1,142 @@
+/* =========================
+   EXPLAINER PAGE LAYOUT
+========================= */
+
+.explainer-main {
+    padding: 5rem 2rem 6rem;
+}
+
+/* =========================
+   HEADER
+========================= */
+
+.explainer-header {
+    max-width: 720px;
+    margin: 0 auto 3.5rem;
+}
+
+.explainer-header h1 {
+    font-size: 2.8rem;
+    margin-bottom: 0.75rem;
+}
+
+.explainer-subtitle {
+    font-size: 1.15rem;
+    color: #c7d2ff;
+    line-height: 1.6;
+}
+
+/* =========================
+   INPUT SECTION
+========================= */
+
+.explainer-input-section {
+    max-width: 720px;
+    margin: 0 auto 4.5rem;
+}
+
+.explainer-card {
+    background: linear-gradient(180deg,
+            rgba(255, 255, 255, 0.07),
+            rgba(255, 255, 255, 0.03));
+    border: 1px solid rgba(127, 161, 255, 0.18);
+    border-radius: 22px;
+    padding: 2.75rem;
+}
+
+/* Card title */
+.explainer-card h2 {
+    font-size: 1.35rem;
+    margin-bottom: 2rem;
+}
+
+/* =========================
+   FORM FIELDS
+========================= */
+
+.explainer-field {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.5rem;
+}
+
+.explainer-field label {
+    font-size: 0.85rem;
+    color: #9aa3b2;
+    margin-bottom: 0.4rem;
+}
+
+.explainer-field input,
+.explainer-field textarea {
+    background: rgba(4, 10, 22, 0.9);
+    border: 1px solid rgba(127, 161, 255, 0.22);
+    border-radius: 12px;
+    padding: 0.75rem 0.85rem;
+    font-size: 0.95rem;
+    color: white;
+    outline: none;
+}
+
+.explainer-field textarea {
+    resize: vertical;
+    min-height: 110px;
+}
+
+.explainer-field input::placeholder,
+.explainer-field textarea::placeholder {
+    color: #6f7a90;
+}
+
+/* Focus state */
+.explainer-field input:focus,
+.explainer-field textarea:focus {
+    border-color: rgba(127, 161, 255, 0.5);
+}
+
+/* =========================
+   SUBMIT BUTTON
+========================= */
+
+.explainer-submit {
+    margin-top: 1.75rem;
+    width: 100%;
+    font-size: 1rem;
+}
+
+/* =========================
+   RESULTS PLACEHOLDER
+========================= */
+
+.explainer-results-section {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.explainer-results-placeholder {
+    border-radius: 20px;
+    padding: 3rem 2rem;
+    text-align: center;
+    background: linear-gradient(180deg,
+            rgba(255, 255, 255, 0.04),
+            rgba(255, 255, 255, 0.015));
+    border: 1px dashed rgba(127, 161, 255, 0.25);
+}
+
+.explainer-results-placeholder p {
+    font-size: 0.95rem;
+    color: #9aa3b2;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 768px) {
+    .explainer-header h1 {
+        font-size: 2.2rem;
+    }
+
+    .explainer-card {
+        padding: 2rem;
+    }
+}

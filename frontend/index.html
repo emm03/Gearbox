@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>GEARBOX</title>
+
+    <style>
+        html,
+        body {
+            margin: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: radial-gradient(circle at top left,
+                    #1b2a44 0%,
+                    #0b1220 45%,
+                    #060b15 100%);
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #f2f5fa;
+        }
+
+        /* ---------------- INTRO ---------------- */
+
+        #intro {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.6s ease;
+            z-index: 10;
+        }
+
+        #stage {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .letter {
+            position: absolute;
+            font-size: 11rem;
+            font-weight: 800;
+            color: #f2f5fa;
+            transform: translate(-50%, -50%);
+            will-change: transform, top, left;
+        }
+
+        #scroll-hint {
+            position: absolute;
+            bottom: 4rem;
+            font-size: 0.85rem;
+            letter-spacing: 0.25em;
+            opacity: 0.6;
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* ---------------- SLIDES ---------------- */
+
+        #slides {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.6s ease;
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0 12vw;
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 0.7s ease, transform 0.7s ease;
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        p {
+            max-width: 950px;
+            font-size: 1.1rem;
+            line-height: 1.7;
+            opacity: 0.85;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 3.5rem;
+            max-width: 1100px;
+            width: 100%;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 18px;
+            padding: 2.25rem;
+            text-align: left;
+        }
+
+        .card h3 {
+            margin-top: 0;
+            margin-bottom: 0.75rem;
+        }
+
+        .card p {
+            font-size: 0.95rem;
+            opacity: 0.8;
+            line-height: 1.6;
+        }
+
+        .scroll-next {
+            position: absolute;
+            bottom: 4rem;
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            opacity: 0.6;
+            transition: opacity 0.4s ease;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- INTRO -->
+    <div id="intro">
+        <div id="stage"></div>
+        <div id="scroll-hint">SCROLL</div>
+    </div>
+
+    <!-- SLIDES -->
+    <div id="slides">
+
+        <!-- SLIDE 1 -->
+        <section class="slide active">
+            <h1>What is Gearbox?</h1>
+            <p>
+                Gearbox is an AI-powered assistant built specifically for retail environments
+                where employees are expected to explain increasingly technical products with
+                limited training time.
+            </p>
+            <p>
+                Instead of memorizing specs or relying on guesswork, Gearbox helps employees
+                translate complex product information into clear, confident explanations in
+                real time.
+            </p>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>Designed for the Sales Floor</h3>
+                    <p>
+                        Gearbox is optimized for fast, real conversations — not long manuals
+                        or dense documentation.
+                    </p>
+                </div>
+                <div class="card">
+                    <h3>Consistency Without Scripts</h3>
+                    <p>
+                        Customers receive accurate, consistent information without employees
+                        sounding robotic or scripted.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 2 -->
+        <section class="slide">
+            <h1>Real Store Scenarios</h1>
+            <p>
+                Gearbox is designed around the situations that slow teams down,
+                create uncertainty, or lead to missed sales opportunities.
+            </p>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>New Hire, Busy Shift</h3>
+                    <p>
+                        When a customer asks about an unfamiliar product, Gearbox
+                        provides a clear explanation, key differences, and common use cases
+                        in seconds.
+                    </p>
+                </div>
+                <div class="card">
+                    <h3>High-Stakes Comparisons</h3>
+                    <p>
+                        Customers choosing between similar products get side-by-side clarity
+                        without technical overload or pressure.
+                    </p>
+                </div>
+                <div class="card">
+                    <h3>Edge-Case Questions</h3>
+                    <p>
+                        Gearbox fills in knowledge gaps when questions go beyond standard
+                        training materials.
+                    </p>
+                </div>
+                <div class="card">
+                    <h3>Confidence Under Pressure</h3>
+                    <p>
+                        Employees stay calm and credible during rushes instead of deferring
+                        or guessing.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SLIDE 3 -->
+        <section class="slide">
+            <h1>Core Features & Philosophy</h1>
+            <p>
+                Gearbox is intentionally focused. It is built to support human interaction,
+                not replace it.
+            </p>
+
+            <div class="grid">
+                <div class="card">
+                    <h3>Dual Explanation Modes</h3>
+                    <p>
+                        Switch between internal, training-oriented language and customer-facing
+                        explanations depending on the conversation.
+                    </p>
+                </div>
+                <div class="card">
+                    <h3>Product-Aware AI</h3>
+                    <p>
+                        Responses are grounded in real product specs, categories, and intended
+                        use — not generic AI answers.
+                    </p>
+                </div>
+                <div class="card">
+                    <h3>Reduced Training Load</h3>
+                    <p>
+                        New employees ramp faster without memorizing catalogs or relying
+                        on constant supervision.
+                    </p>
+                </div>
+                <div class="card">
+                    <h3>Expandable by Store</h3>
+                    <p>
+                        Retailers can tailor Gearbox to their product lines, terminology,
+                        and training standards over time.
+                    </p>
+                </div>
+            </div>
+
+
+            <div class="scroll-next">SCROLL TO ENTER TO THE HOME PAGE</div>
+        </section>
+
+    </div>
+
+    <script>
+        /* -------- BOUNCE INTRO (UNCHANGED) -------- */
+
+        const word = "GEARBOX";
+        const stage = document.getElementById("stage");
+
+        const vw = window.innerWidth;
+        const vh = window.innerHeight;
+
+        const groundY = vh * 0.62;
+        const finalY = vh * 0.45;
+        const spacing = 130;
+
+        const totalWidth = (word.length - 1) * spacing;
+        const baseFinalX = vw / 2 - totalWidth / 2;
+
+        const gravity = 3200;
+        const bounceImpulse = -1500;
+        const glideEase = 0.09;
+
+        const letters = [];
+
+        class Letter {
+            constructor(char, index) {
+                this.el = document.createElement("div");
+                this.el.className = "letter";
+                this.el.textContent = char;
+                stage.appendChild(this.el);
+
+                this.x = vw * 0.15 + Math.random() * vw * 0.7;
+                this.y = vh * 0.1 + Math.random() * vh * 0.15;
+
+                this.vy = 0;
+                this.state = "fall";
+
+                this.finalX = baseFinalX + index * spacing;
+                this.finalY = finalY;
+
+                this.delay = index * 140 + Math.random() * 200;
+                this.startTime = null;
+                this.render();
+            }
+
+            update(dt, time) {
+                if (!this.startTime) this.startTime = time;
+                if (time - this.startTime < this.delay) return;
+
+                if (this.state === "fall") {
+                    this.vy += gravity * dt;
+                    this.y += this.vy * dt;
+                    if (this.y >= groundY) {
+                        this.y = groundY;
+                        this.vy = bounceImpulse;
+                        this.state = "bounce";
+                    }
+                } else if (this.state === "bounce") {
+                    this.vy += gravity * dt;
+                    this.y += this.vy * dt;
+                    if (this.vy > 0) this.state = "glide";
+                } else {
+                    this.x += (this.finalX - this.x) * glideEase;
+                    this.y += (this.finalY - this.y) * glideEase;
+                }
+
+                this.render();
+            }
+
+            render() {
+                this.el.style.left = `${this.x}px`;
+                this.el.style.top = `${this.y}px`;
+            }
+        }
+
+        word.split("").forEach((c, i) => letters.push(new Letter(c, i)));
+
+        let last = null;
+        function animate(t) {
+            if (!last) last = t;
+            const dt = (t - last) / 1000;
+            last = t;
+            letters.forEach(l => l.update(dt, t));
+            requestAnimationFrame(animate);
+        }
+        requestAnimationFrame(animate);
+
+        /* -------- SCROLL LOGIC (LESS SENSITIVE) -------- */
+
+        const intro = document.getElementById("intro");
+        const slides = document.querySelectorAll(".slide");
+        const slidesContainer = document.getElementById("slides");
+
+        let current = 0;
+        let introVisible = true;
+        let locked = false;
+        let acc = 0;
+
+        const SCROLL_THRESHOLD = 420;
+        const LOCK_TIME = 900;
+
+        function showSlide(i) {
+            slides.forEach((s, idx) => s.classList.toggle("active", idx === i));
+        }
+
+        window.addEventListener("wheel", e => {
+            acc += Math.sign(e.deltaY) * Math.min(Math.abs(e.deltaY), 100);
+
+            if (Math.abs(acc) < SCROLL_THRESHOLD || locked) return;
+
+            locked = true;
+
+            if (introVisible && acc > 0) {
+                intro.classList.add("hidden");
+                slidesContainer.style.opacity = 1;
+                introVisible = false;
+                current = 0;
+                showSlide(current);
+            } else if (!introVisible && acc < 0 && current === 0) {
+                intro.classList.remove("hidden");
+                slidesContainer.style.opacity = 0;
+                introVisible = true;
+            } else if (!introVisible) {
+
+                // scrolling down
+                if (acc > 0) {
+                    if (current < slides.length - 1) {
+                        current++;
+                        showSlide(current);
+                    } else {
+                        // 🚀 reached last slide → go to home page
+                        window.location.href = "home.html";
+                        return;
+                    }
+                }
+
+                // scrolling up
+                if (acc < 0 && current > 0) {
+                    current--;
+                    showSlide(current);
+                }
+            }
+
+            acc = 0;
+            setTimeout(() => locked = false, LOCK_TIME);
+        });
+    </script>
+
+</body>
+
+</html>

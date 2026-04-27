@@ -1,0 +1,502 @@
+/* RESET */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+
+body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    background: radial-gradient(circle at top, #0b1b33, #040a16);
+    color: white;
+    line-height: 1.55;
+}
+
+
+/* NAV */
+.nav {
+    position: sticky;
+    top: 0;
+    background: linear-gradient(to right, #0b1b33, #060c18);
+    z-index: 10;
+}
+
+
+.nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+
+.logo {
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+
+.nav-links a {
+    color: #9bb6ff;
+    text-decoration: none;
+    margin-left: 1.5rem;
+    font-size: 0.95rem;
+}
+
+
+.nav-links a.active,
+.nav-links a:hover {
+    color: white;
+}
+
+
+/* =========================
+   HERO
+ ========================= */
+
+
+.hero-section {
+    min-height: calc(100vh - 70px);
+    padding: 6rem 2rem;
+    display: flex;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+
+.hero-section::before {
+    content: "";
+    position: absolute;
+    inset: -200px;
+    background:
+        radial-gradient(circle at 25% 30%, rgba(127, 161, 255, 0.22), transparent 55%),
+        radial-gradient(circle at 75% 60%, rgba(255, 255, 255, 0.10), transparent 60%);
+    filter: blur(30px);
+    pointer-events: none;
+}
+
+
+.hero-layout {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 4rem;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+}
+
+
+/* HERO TEXT */
+.hero-content h1 {
+    font-size: 3.2rem;
+    line-height: 1.15;
+    margin-bottom: 1.5rem;
+}
+
+
+.hero-line {
+    display: block;
+    margin-bottom: 0.35rem;
+
+    transform-origin: center left;
+    will-change: transform;
+}
+
+.hero-line {
+    transition: transform 0.15s ease-out;
+}
+
+.hero-line.accent {
+    color: #9bb6ff;
+    margin-bottom: 0;
+    transition: color 0.25s ease;
+    will-change: color;
+}
+
+
+.hero-lead {
+    font-size: 1.15rem;
+    color: #c7d2ff;
+    max-width: 520px;
+    margin-bottom: 1.75rem;
+}
+
+
+.hero-meta {
+    font-size: 0.85rem;
+    color: #9aa3b2;
+    margin-bottom: 2.5rem;
+}
+
+
+.hero-scroll {
+    font-size: 0.85rem;
+    color: #9bb6ff;
+    opacity: 0.8;
+}
+
+
+/* HERO EXAMPLE CARD */
+.example-card {
+    align-self: center;
+    padding: 2rem 2.25rem;
+    border-radius: 18px;
+    background: linear-gradient(180deg,
+            rgba(255, 255, 255, 0.08),
+            rgba(255, 255, 255, 0.03));
+    border: 1px solid rgba(127, 161, 255, 0.2);
+}
+
+
+.example-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #9bb6ff;
+    margin-bottom: 1rem;
+}
+
+
+.example-text {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: #e3e9ff;
+    margin-bottom: 1rem;
+}
+
+
+.example-footer {
+    font-size: 0.8rem;
+    color: #9aa3b2;
+}
+
+
+/* =========================
+   HERO WORD REVEAL
+ ========================= */
+
+
+.hero-reveal .word {
+    display: inline-block;
+    opacity: 0;
+    transform: translateY(4px);
+    /* less movement */
+    transition:
+        opacity 0.5s ease,
+        transform 0.5s ease;
+    margin-right: 0.35rem;
+}
+
+
+/* remove margin after last word */
+.hero-reveal .word:last-child {
+    margin-right: 0;
+}
+
+
+.hero-reveal .word.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+/* =========================
+   MODE COMPARISON
+ ========================= */
+
+
+.mode-compare {
+    padding: 6rem 2rem 7rem;
+}
+
+
+.mode-compare-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+
+.mode-compare-header {
+    max-width: 720px;
+    margin-bottom: 4rem;
+}
+
+
+.mode-compare-header h2 {
+    font-size: 2.4rem;
+    margin-bottom: 1rem;
+}
+
+
+.mode-compare-header p {
+    color: #c7d2ff;
+    font-size: 1.1rem;
+}
+
+
+.mode-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2.5rem;
+}
+
+
+.mode-card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(127, 161, 255, 0.15);
+    border-radius: 20px;
+    padding: 2.75rem;
+    display: flex;
+    flex-direction: column;
+}
+
+
+.mode-card h3 {
+    font-size: 1.6rem;
+    margin-bottom: 0.75rem;
+}
+
+
+.mode-card .lead {
+    color: #c7d2ff;
+    margin-bottom: 2rem;
+}
+
+
+.mode-points {
+    display: grid;
+    gap: 1.25rem;
+    margin-bottom: 2.25rem;
+}
+
+
+.mode-point h4 {
+    font-size: 0.95rem;
+    margin-bottom: 0.25rem;
+}
+
+
+.mode-point p {
+    font-size: 0.9rem;
+    color: #dbe1ff;
+}
+
+
+/* BUTTONS (unified) */
+.primary-btn,
+.secondary-btn {
+    margin-top: auto;
+    padding: 0.9rem 2rem;
+    border-radius: 999px;
+    font-weight: 600;
+    text-decoration: none;
+    background: #7fa1ff;
+    color: #020617;
+    border: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+
+/* =========================
+   VALUES
+ ========================= */
+
+
+.value-section {
+    padding: 6rem 2rem 5.5rem;
+    background: linear-gradient(to bottom,
+            rgba(4, 10, 22, 0),
+            rgba(4, 10, 22, 0.9));
+}
+
+
+.value-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+
+.value-header {
+    max-width: 720px;
+    margin-bottom: 3.5rem;
+}
+
+
+.value-header h2 {
+    font-size: 2.2rem;
+    margin-bottom: 1rem;
+}
+
+
+.value-header p {
+    color: #c7d2ff;
+    font-size: 1.05rem;
+}
+
+
+.value-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2.5rem;
+}
+
+
+.value-card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+    border: 1px solid rgba(127, 161, 255, 0.15);
+    border-radius: 18px;
+    padding: 2.25rem;
+}
+
+
+.value-card h3 {
+    font-size: 1.15rem;
+    margin-bottom: 0.75rem;
+}
+
+
+.value-card p {
+    font-size: 0.95rem;
+    color: #dbe1ff;
+}
+
+
+/* FOOTER */
+.footer {
+    padding: 3rem 0 2.75rem;
+    background: rgba(4, 10, 22, 1);
+    text-align: center;
+    color: #9aa3b2;
+    font-size: 0.85rem;
+    border-top: 1px solid rgba(127, 161, 255, 0.12);
+}
+
+
+/* Example text animation */
+.example-text {
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+
+.example-text.example-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+/* Scroll reveal base */
+.reveal {
+    opacity: 0;
+    transform: translateY(14px);
+    transition:
+        opacity 0.6s ease,
+        transform 0.6s ease;
+    will-change: opacity, transform;
+}
+
+
+.reveal-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+/* =========================
+   VALUE CARD INTERACTION
+ ========================= */
+
+
+.value-card {
+    transition:
+        transform 0.25s ease,
+        box-shadow 0.25s ease,
+        border-color 0.25s ease,
+        background 0.25s ease;
+    cursor: default;
+}
+
+
+.value-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 22px 48px rgba(0, 0, 0, 0.45);
+    border-color: rgba(127, 161, 255, 0.35);
+    background: linear-gradient(180deg,
+            rgba(127, 161, 255, 0.12),
+            rgba(255, 255, 255, 0.03));
+}
+
+
+/* soften neighbors slightly */
+.value-grid:hover .value-card:not(:hover) {
+    opacity: 0.85;
+}
+
+
+/* =========================
+   CURSOR GLOW (VALUE CARDS)
+ ========================= */
+
+
+.value-card {
+    position: relative;
+    overflow: hidden;
+}
+
+
+/* glow layer */
+.value-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(400px circle at var(--x, 50%) var(--y, 50%),
+            rgba(127, 161, 255, 0.18),
+            transparent 45%);
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+}
+
+
+.value-card:hover::after {
+    opacity: 1;
+}
+
+
+/* =========================
+   EXAMPLE CARD CURSOR GLOW
+ ========================= */
+
+
+.example-card {
+    position: relative;
+    overflow: hidden;
+}
+
+
+/* glow layer */
+.example-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(500px circle at var(--x, 50%) var(--y, 50%),
+            rgba(127, 161, 255, 0.22),
+            transparent 45%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+}
+
+
+.example-card:hover::after {
+    opacity: 1;
+}

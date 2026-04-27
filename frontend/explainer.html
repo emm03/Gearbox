@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Gearbox – Explainer</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Reuse shared styles -->
+    <link rel="stylesheet" href="css/home.css" />
+    <link rel="stylesheet" href="css/explainer.css" />
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <header class="nav">
+        <div class="nav-inner">
+            <div class="logo">GEARBOX</div>
+            <nav class="nav-links">
+                <a href="home.html">Home</a>
+                <a href="explainer.html" class="active">Explainer</a>
+                <a href="learn.html">Learn</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="explainer-main">
+
+        <!-- HEADER -->
+        <section class="explainer-header">
+            <h1>Explain a product clearly</h1>
+            <p class="explainer-subtitle">
+                Get a clear, human explanation of a product before you buy.
+                No sales pressure. No spec overload.
+            </p>
+        </section>
+
+        <!-- INPUT CARD -->
+        <section class="explainer-input-section">
+            <div class="explainer-card">
+
+                <h2>Product details</h2>
+
+                <div class="explainer-field">
+                    <label for="product-name">Product name</label>
+                    <input id="product-name" type="text" placeholder="e.g. Trek Marlin 7, Patagonia Nano Puff" />
+                </div>
+
+                <div class="explainer-field">
+                    <label for="product-store">Store or brand (optional)</label>
+                    <input id="product-store" type="text" placeholder="e.g. REI, Backcountry, Specialized" />
+                </div>
+
+                <div class="explainer-field">
+                    <label for="product-link">Product link (optional)</label>
+                    <input id="product-link" type="url" placeholder="https://" />
+                </div>
+
+                <div class="explainer-field">
+                    <label for="product-specs">Specs or description (optional)</label>
+                    <textarea id="product-specs" rows="5"
+                        placeholder="Paste specs or product description here..."></textarea>
+                </div>
+
+                <button id="explainer-submit" class="primary-btn explainer-submit">
+                    Explain this product
+                </button>
+
+            </div>
+        </section>
+
+        <!-- RESULTS PLACEHOLDER -->
+        <section class="explainer-results-section">
+            <div class="explainer-results-placeholder">
+                <p>
+                    Your explanation will appear here once the product is analyzed.
+                </p>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="footer">
+        © Gearbox
+    </footer>
+
+    <!-- JS will be added later -->
+    <script src="script.js"></script>
+
+</body>
+
+</html>

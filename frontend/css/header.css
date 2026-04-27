@@ -1,0 +1,69 @@
+/* ============================================================
+   SHARED HEADER — Used on ALL pages
+============================================================ */
+
+header {
+    background: #111827;
+    color: #f9fafb;
+    padding: 14px 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Inner structure (logo left, nav right) */
+.header-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+/* Logo section */
+.logo-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: 700;
+    font-size: 1.2rem;
+}
+
+.logo-mark {
+    width: 30px;
+    height: 30px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, #2563eb, #22c55e);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #f9fafb;
+    font-weight: 800;
+    font-size: 0.95rem;
+}
+
+.logo-text {
+    letter-spacing: 0.04em;
+}
+
+/* Navigation */
+.main-nav {
+    display: flex;
+    gap: 18px;
+}
+
+.nav-link {
+    color: #d1d5db;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 0.95rem;
+}
+
+.nav-link:hover {
+    color: #ffffff;
+}
+
+.nav-link.active {
+    color: #ffffff;
+    border-bottom: 2px solid #3b82f6;
+    padding-bottom: 2px;
+}
