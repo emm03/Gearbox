@@ -58,6 +58,9 @@
             <div class="explainer-form-wrap">
                 <div class="explainer-form-panel" data-panel="single">
                     <h3>Single product guidance</h3>
+                    <p class="why-different-note">
+                        Gearbox does not just explain specs. It turns product details into buying guidance, tradeoffs, and questions to ask before purchasing.
+                    </p>
                     <div class="explainer-field-grid">
                         <div class="explainer-field">
                             <label for="single-store">Store or brand</label>
@@ -96,11 +99,13 @@
                         <div class="explainer-field full-width">
                             <label for="single-product-link">Product link (optional)</label>
                             <input id="single-product-link" type="url" placeholder="https://" />
+                            <p class="field-helper">Optional. Some retail sites block automatic reading, so paste specs below for the best result.</p>
                         </div>
 
                         <div class="explainer-field full-width">
-                            <label for="single-product-specs">Specs or description (optional)</label>
+                            <label for="single-product-specs">Specs or product details (recommended)</label>
                             <textarea id="single-product-specs" rows="5" placeholder="Paste specs, bullet points, or product details..."></textarea>
+                            <p class="field-helper">Paste key specs, product description, materials, sizing, features, or review notes.</p>
                         </div>
 
                         <div class="explainer-field full-width">
@@ -165,7 +170,8 @@
                     <h3>Decision dashboard preview</h3>
                     <span class="result-mode-pill">Ready</span>
                 </div>
-                <p class="empty-copy">After you submit, Gearbox will organize your guidance into quick verdicts, fit guidance, spec priorities, and recommendation cards.</p>
+                <p class="empty-copy">Gearbox works best when you include product details. A link can help if the page is readable, but pasted specs are more reliable.</p>
+                <p class="empty-copy">The output focuses on buying guidance, tradeoffs, and next checks — not generic product facts.</p>
                 <div class="explainer-result-grid">
                     <article class="result-card"><h4>Quick verdict</h4><p>A concise first recommendation will appear here.</p></article>
                     <article class="result-card"><h4>Who it’s for</h4><p>Clear buyer-fit guidance will appear here.</p></article>
@@ -185,7 +191,13 @@
                     <button class="chip" type="button">What should I ask an employee?</button>
                     <button class="chip" type="button">Compare to a cheaper option</button>
                 </div>
-                <p class="followup-response" id="followup-response"></p>
+                <div class="followup-answer-panel hidden" id="followup-answer-panel">
+                    <div class="followup-answer-header">
+                        <h4 id="followup-question-title">Follow-up question</h4>
+                        <button class="clear-followup-btn" id="clear-followup-btn" type="button">Clear follow-up</button>
+                    </div>
+                    <p class="followup-response" id="followup-response"></p>
+                </div>
             </div>
         </section>
 

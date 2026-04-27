@@ -87,6 +87,12 @@ STYLE RULES
 - Bullets should be short and actionable.
 - Recommendation must answer the shopper's decision goal directly.
 - If data is limited, provide careful guidance and explicit "what to check" points.
+- SINGLE-MODE MISSING DATA RULE:
+  If only product name/link are provided and specs are missing, you MUST clearly include:
+  1) what you can infer with low confidence,
+  2) what you cannot verify,
+  3) which specs/details the shopper should check next before purchasing.
+  Do not pretend missing specs are known.
 
 Now return JSON only.
 `;

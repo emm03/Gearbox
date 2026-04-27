@@ -193,6 +193,13 @@ function initExplainerMode() {
 
     document.addEventListener("click", (e) => {
         const chip = e.target.closest(".chip");
+        const clearBtn = e.target.closest("#clear-followup-btn");
+
+        if (clearBtn) {
+            clearFollowupAnswer();
+            return;
+        }
+
         if (!chip) return;
 
         const wrap = chip.closest(".followup-chips");
@@ -415,14 +422,22 @@ function renderFollowupShell(dynamicSuggestions = []) {
             <div class="followup-chips">
                 ${chips.map(chip => `<button class="chip" type="button">${escapeHtml(chip)}</button>`).join("")}
             </div>
-            <p class="followup-response" id="followup-response"></p>
+            <div class="followup-answer-panel hidden" id="followup-answer-panel">
+                <div class="followup-answer-header">
+                    <h4 id="followup-question-title">Follow-up question</h4>
+                    <button class="clear-followup-btn" id="clear-followup-btn" type="button">Clear follow-up</button>
+                </div>
+                <p class="followup-response" id="followup-response"></p>
+            </div>
         </div>
     `;
 }
 
 function renderFollowupTip(label, context) {
+    const panel = document.getElementById("followup-answer-panel");
+    const title = document.getElementById("followup-question-title");
     const out = document.getElementById("followup-response");
-    if (!out) return;
+    if (!out || !panel || !title) return;
 
     const tips = {
         "Explain this simpler": "Reduce this to one sentence: who it helps, why it helps, and the main tradeoff.",
@@ -440,7 +455,25 @@ function renderFollowupTip(label, context) {
         suffix = ` For ${context.compareProducts[0].name} vs ${context.compareProducts[1].name}, ask which one is easier to live with over 12 months.`;
     }
 
+    title.textContent = label || "Follow-up question";
     out.textContent = `${tips[label] || "Use this as a next-step buying question."}${suffix}`;
+    panel.classList.remove("hidden");
+}
+
+function clearFollowupAnswer() {
+    const panel = document.getElementById("followup-answer-panel");
+    const out = document.getElementById("followup-response");
+    const title = document.getElementById("followup-question-title");
+
+    if (!panel || !out || !title) return;
+
+    panel.classList.add("hidden");
+    out.textContent = "";
+    title.textContent = "Follow-up question";
+
+    document.querySelectorAll(".followup-chips .chip.active").forEach(chip => {
+        chip.classList.remove("active");
+    });
 }
 
 function buildResultCard(title, bodyHtml) {
