@@ -121,105 +121,361 @@ function initExampleCardGlow() {
  * EXPLAINER MODE
  *************************************************/
 
+const EXPLAINER_GOALS = [
+    "Is this right for me?",
+    "Is it worth the price?",
+    "Explain the specs",
+    "Compare two products",
+    "What should I know before buying?",
+];
+
+const DEFAULT_FOLLOW_UPS = [
+    "Explain this simpler",
+    "Is this beginner friendly?",
+    "What are the downsides?",
+    "What should I ask an employee?",
+    "Compare to a cheaper option"
+];
+
 function initExplainerMode() {
     const explainBtn = document.getElementById("explainer-submit");
     if (!explainBtn) return;
 
-    explainBtn.addEventListener("click", handleExplainClick);
-}
+    const goalCards = document.querySelectorAll(".goal-card");
+    const modeButtons = document.querySelectorAll(".mode-toggle");
+    const modePanels = document.querySelectorAll(".explainer-form-panel");
 
-async function handleExplainClick() {
-    const productName = document.getElementById("product-name")?.value.trim();
-    const store = document.getElementById("product-store")?.value.trim();
-    const specs = document.getElementById("product-specs")?.value.trim();
+    let currentMode = "single";
+    let currentGoal = EXPLAINER_GOALS[0];
+    let lastResultContext = null;
 
-    if (!productName) {
-        alert("Please enter a product name.");
-        return;
-    }
-
-    const resultsSection = document.querySelector(".explainer-results-section");
-    if (resultsSection) {
-        resultsSection.innerHTML = `<p>Analyzing product...</p>`;
-    }
-
-    try {
-        const response = await fetch("http://localhost:4000/api/explain", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ productName, store, specs })
+    const setMode = (mode) => {
+        currentMode = mode;
+        modeButtons.forEach((btn) => {
+            const active = btn.dataset.mode === mode;
+            btn.classList.toggle("active", active);
+            btn.setAttribute("aria-selected", active ? "true" : "false");
         });
 
-        const data = await response.json();
+        modePanels.forEach((panel) => {
+            panel.classList.toggle("hidden", panel.dataset.panel !== mode);
+        });
+    };
 
-        if (!response.ok) {
-            throw new Error(data.error || "Failed to explain product");
+    const setGoal = (goal) => {
+        currentGoal = goal;
+        goalCards.forEach((card) => {
+            const active = card.dataset.goal === goal;
+            card.classList.toggle("active", active);
+            card.setAttribute("aria-pressed", active ? "true" : "false");
+        });
+
+        if (goal === "Compare two products") {
+            setMode("compare");
+        }
+    };
+
+    goalCards.forEach((card) => {
+        card.addEventListener("click", () => setGoal(card.dataset.goal));
+    });
+
+    modeButtons.forEach((btn) => {
+        btn.addEventListener("click", () => {
+            setMode(btn.dataset.mode);
+            if (btn.dataset.mode === "single" && currentGoal === "Compare two products") {
+                setGoal("Is this right for me?");
+            }
+            if (btn.dataset.mode === "compare" && currentGoal !== "Compare two products") {
+                setGoal("Compare two products");
+            }
+        });
+    });
+
+    document.addEventListener("click", (e) => {
+        const chip = e.target.closest(".chip");
+        if (!chip) return;
+
+        const wrap = chip.closest(".followup-chips");
+        if (!wrap) return;
+
+        wrap.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+        chip.classList.add("active");
+        renderFollowupTip(chip.textContent.trim(), lastResultContext);
+    });
+
+    explainBtn.addEventListener("click", async () => {
+        if (currentMode === "compare") {
+            lastResultContext = await handleCompareExplainClick(currentGoal);
+            return;
         }
 
-        renderExplainerResult(data);
+        lastResultContext = await handleSingleExplainClick(currentGoal);
+    });
 
+    setGoal(currentGoal);
+    setMode(currentMode);
+}
+
+async function handleSingleExplainClick(goal) {
+    const payload = {
+        mode: "single",
+        decisionGoal: goal,
+        category: document.getElementById("single-category")?.value || "",
+        buyerContext: document.getElementById("single-buyer-context")?.value.trim() || "",
+        productName: document.getElementById("single-product-name")?.value.trim() || "",
+        store: document.getElementById("single-store")?.value || "",
+        specs: document.getElementById("single-product-specs")?.value.trim() || "",
+        pageText: document.getElementById("single-product-link")?.value.trim() || ""
+    };
+
+    if (!payload.productName) {
+        alert("Please enter a product name.");
+        return null;
+    }
+
+    setExplainerLoadingState(`Building buying guidance for ${payload.productName}...`);
+
+    try {
+        const data = await requestExplainer(payload);
+        renderSingleExplainerResult(dataToPlainObject(data));
+        return { mode: "single", goal, productName: payload.productName, data };
     } catch (err) {
         console.error(err);
-        if (resultsSection) {
-            resultsSection.innerHTML = `<p>Something went wrong.</p>`;
-        }
+        setExplainerErrorState("Something went wrong while building buying guidance.");
+        return null;
     }
 }
 
-function renderExplainerResult(data) {
-    const resultsSection = document.querySelector(".explainer-results-section");
+async function handleCompareExplainClick(goal) {
+    const compareProducts = [
+        {
+            label: "A",
+            name: document.getElementById("compare-a-name")?.value.trim() || "",
+            store: document.getElementById("compare-a-store")?.value.trim() || "",
+            pageText: document.getElementById("compare-a-link")?.value.trim() || "",
+            specs: document.getElementById("compare-a-specs")?.value.trim() || "",
+        },
+        {
+            label: "B",
+            name: document.getElementById("compare-b-name")?.value.trim() || "",
+            store: document.getElementById("compare-b-store")?.value.trim() || "",
+            pageText: document.getElementById("compare-b-link")?.value.trim() || "",
+            specs: document.getElementById("compare-b-specs")?.value.trim() || "",
+        }
+    ];
+
+    if (!compareProducts[0].name || !compareProducts[1].name) {
+        alert("Please enter both Product A and Product B names.");
+        return null;
+    }
+
+    setExplainerLoadingState(`Comparing ${compareProducts[0].name} vs ${compareProducts[1].name}...`);
+
+    try {
+        const data = await requestExplainer({
+            mode: "compare",
+            decisionGoal: goal,
+            category: "",
+            buyerContext: "",
+            productName: "",
+            store: "",
+            specs: "",
+            pageText: "",
+            compareProducts
+        });
+
+        renderCompareExplainerResult(dataToPlainObject(data), compareProducts);
+        return { mode: "compare", goal, compareProducts, data };
+    } catch (err) {
+        console.error(err);
+        setExplainerErrorState("Something went wrong while comparing products.");
+        return null;
+    }
+}
+
+async function requestExplainer(payload) {
+    const response = await fetch("http://localhost:4000/api/explain", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    });
+
+    const data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.error || "Failed to explain product");
+    }
+
+    return data;
+}
+
+function setExplainerLoadingState(message) {
+    const resultsSection = document.getElementById("explainer-results");
     if (!resultsSection) return;
 
     resultsSection.innerHTML = `
-        <div class="explainer-card">
-            <h2>${data.title || "Product explanation"}</h2>
-
-            <p class="explainer-summary">
-                ${data.overview || ""}
-            </p>
-
-            ${Array.isArray(data.goodFor) && data.goodFor.length ? `
-                <h3>What this product is good for</h3>
-                <ul>
-                    ${data.goodFor.map(item => `<li>${item}</li>`).join("")}
-                </ul>
-            ` : ""}
-
-            ${Array.isArray(data.feelsLike) && data.feelsLike.length ? `
-                <h3>What it feels like to use</h3>
-                <ul>
-                    ${data.feelsLike.map(item => `<li>${item}</li>`).join("")}
-                </ul>
-            ` : ""}
-
-            ${Array.isArray(data.specsMeaning) && data.specsMeaning.length ? `
-                <h3>What the specs actually mean</h3>
-                <ul>
-                    ${data.specsMeaning.map(item => `<li>${item}</li>`).join("")}
-                </ul>
-            ` : ""}
-
-            ${Array.isArray(data.thingsToKnow) && data.thingsToKnow.length ? `
-                <h3>Things to know before choosing it</h3>
-                <ul>
-                    ${data.thingsToKnow.map(item => `<li>${item}</li>`).join("")}
-                </ul>
-            ` : ""}
-
-            ${data.whoFor ? `
-                <h3>Who this is for</h3>
-                <p>${data.whoFor}</p>
-            ` : ""}
-
-            ${data.nextStep ? `
-                <div class="explainer-followup">
-                    <em>${data.nextStep}</em>
-                </div>
-            ` : ""}
+        <div class="explainer-result-shell">
+            <div class="result-heading">
+                <h3>Preparing your decision dashboard</h3>
+                <span class="result-mode-pill">Loading</span>
+            </div>
+            <p>${escapeHtml(message)}</p>
         </div>
     `;
+}
+
+function setExplainerErrorState(message) {
+    const resultsSection = document.getElementById("explainer-results");
+    if (!resultsSection) return;
+
+    resultsSection.innerHTML = `
+        <div class="explainer-result-shell">
+            <div class="result-heading">
+                <h3>Couldn’t generate guidance</h3>
+                <span class="result-mode-pill">Error</span>
+            </div>
+            <p>${escapeHtml(message)}</p>
+        </div>
+    `;
+}
+
+function renderSingleExplainerResult(data) {
+    const resultsSection = document.getElementById("explainer-results");
+    if (!resultsSection) return;
+
+    resultsSection.innerHTML = `
+        <div class="explainer-result-shell">
+            <div class="result-heading">
+                <h3>${escapeHtml(data.title || "Buying guidance")}</h3>
+                <span class="result-mode-pill">Single product</span>
+            </div>
+
+            <div class="result-card featured-card">
+                <h4>Quick verdict</h4>
+                <p>${escapeHtml(paragraphOrFallback(data.quickVerdict, "No verdict generated yet."))}</p>
+            </div>
+
+            <div class="explainer-result-grid">
+                ${buildResultCard("Plain English summary", `<p>${escapeHtml(paragraphOrFallback(data.plainEnglishSummary, "No summary generated yet."))}</p>`) }
+                ${buildResultCard("Who it’s for", listToHtml(listOrEmpty(data.bestFor), "No audience guidance generated yet."))}
+                ${buildResultCard("Who should avoid it", listToHtml(listOrEmpty(data.notIdealFor), "No caution guidance generated yet."))}
+                ${buildResultCard("What actually matters in the specs", listToHtml(listOrEmpty(data.specsThatMatter), "No specs guidance generated yet."))}
+                ${buildResultCard("What it feels like to use", listToHtml(listOrEmpty(data.realWorldFeel), "No real-world feel guidance generated yet."))}
+                ${buildResultCard("What you are paying for", listToHtml(listOrEmpty(data.whatYouArePayingFor), "No pricing-value guidance generated yet."))}
+                ${buildResultCard("Recommendation", `<p>${escapeHtml(paragraphOrFallback(data.recommendation, "No recommendation generated yet."))}</p>`) }
+            </div>
+        </div>
+        ${renderFollowupShell(data.followUpSuggestions)}
+    `;
+}
+
+function renderCompareExplainerResult(data, fallbackProducts = []) {
+    const resultsSection = document.getElementById("explainer-results");
+    if (!resultsSection) return;
+
+    const productAName = data.productA?.name || fallbackProducts[0]?.name || "Product A";
+    const productBName = data.productB?.name || fallbackProducts[1]?.name || "Product B";
+
+    resultsSection.innerHTML = `
+        <div class="explainer-result-shell compare-shell">
+            <div class="result-heading">
+                <h3>${escapeHtml(data.title || "Product comparison")}</h3>
+                <span class="result-mode-pill">Compare mode</span>
+            </div>
+
+            <div class="result-card featured-card">
+                <h4>Quick verdict</h4>
+                <p>${escapeHtml(paragraphOrFallback(data.quickVerdict, "No quick verdict generated yet."))}</p>
+            </div>
+
+            <div class="explainer-result-grid">
+                ${buildResultCard(`Pick ${escapeHtml(productAName)} if...`, listToHtml(listOrEmpty(data.productA?.chooseIf), "No guidance generated yet."))}
+                ${buildResultCard(`Pick ${escapeHtml(productBName)} if...`, listToHtml(listOrEmpty(data.productB?.chooseIf), "No guidance generated yet."))}
+                ${buildResultCard(`${escapeHtml(productAName)} tradeoffs`, listToHtml(listOrEmpty(data.productA?.tradeoffs), "No tradeoffs generated yet."))}
+                ${buildResultCard(`${escapeHtml(productBName)} tradeoffs`, listToHtml(listOrEmpty(data.productB?.tradeoffs), "No tradeoffs generated yet."))}
+                ${buildResultCard("Biggest differences", listToHtml(listOrEmpty(data.biggestDifferences), "No differences generated yet."))}
+                ${buildResultCard("What you gain or give up", listToHtml(listOrEmpty(data.whatYouGainOrGiveUp), "No gain/give-up guidance generated yet."))}
+                ${buildResultCard("Final recommendation", `<p>${escapeHtml(paragraphOrFallback(data.finalRecommendation, "No final recommendation generated yet."))}</p>`) }
+            </div>
+        </div>
+        ${renderFollowupShell(data.followUpSuggestions)}
+    `;
+}
+
+function renderFollowupShell(dynamicSuggestions = []) {
+    const chipSet = [...dynamicSuggestions, ...DEFAULT_FOLLOW_UPS]
+        .filter(Boolean)
+        .filter((value, idx, arr) => arr.indexOf(value) === idx)
+        .slice(0, 5);
+
+    const chips = chipSet.length ? chipSet : DEFAULT_FOLLOW_UPS;
+
+    return `
+        <div class="followup-wrap">
+            <p class="followup-title">Follow-up suggestions</p>
+            <div class="followup-chips">
+                ${chips.map(chip => `<button class="chip" type="button">${escapeHtml(chip)}</button>`).join("")}
+            </div>
+            <p class="followup-response" id="followup-response"></p>
+        </div>
+    `;
+}
+
+function renderFollowupTip(label, context) {
+    const out = document.getElementById("followup-response");
+    if (!out) return;
+
+    const tips = {
+        "Explain this simpler": "Reduce this to one sentence: who it helps, why it helps, and the main tradeoff.",
+        "Is this beginner friendly?": "Ask whether setup, daily use, and maintenance are still easy for a first-time buyer.",
+        "What are the downsides?": "Focus on comfort tradeoffs, durability limits, maintenance load, and return-rate concerns.",
+        "What should I ask an employee?": "Ask: what type of customer usually returns this, and what expectation mismatch causes it?",
+        "Compare to a cheaper option": "Compare against one lower-priced alternative on comfort, durability, and long-term value."
+    };
+
+    let suffix = "";
+    if (context?.mode === "single" && context.productName) {
+        suffix = ` For ${context.productName}, ask for one real in-store scenario where this is clearly better.`;
+    }
+    if (context?.mode === "compare" && context.compareProducts?.length === 2) {
+        suffix = ` For ${context.compareProducts[0].name} vs ${context.compareProducts[1].name}, ask which one is easier to live with over 12 months.`;
+    }
+
+    out.textContent = `${tips[label] || "Use this as a next-step buying question."}${suffix}`;
+}
+
+function buildResultCard(title, bodyHtml) {
+    return `
+        <article class="result-card">
+            <h4>${title}</h4>
+            ${bodyHtml}
+        </article>
+    `;
+}
+
+function listOrEmpty(value) {
+    return Array.isArray(value) ? value.filter(Boolean) : [];
+}
+
+function listToHtml(items, fallback) {
+    if (!items.length) return `<p>${escapeHtml(fallback)}</p>`;
+    return `<ul>${items.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+}
+
+function paragraphOrFallback(text, fallback) {
+    return text && String(text).trim() ? String(text).trim() : fallback;
+}
+
+function escapeHtml(str = "") {
+    return String(str)
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll("\"", "&quot;")
+        .replaceAll("'", "&#39;");
+}
+
+function dataToPlainObject(data) {
+    return data && typeof data === "object" ? data : {};
 }
 
 /*************************************************
@@ -488,3 +744,4 @@ function renderFlashcardCompleteState() {
         renderSingleFlashcardView(currentLearningData);
     });
 }
+    const goal = document.getElementById("decision-goal")?.value || "Help me choose between options";
