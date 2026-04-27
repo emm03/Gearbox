@@ -8,21 +8,16 @@ const router = express.Router();
 const openai = require("../services/openai");
 const buildExplainerPrompt = require("../prompts/explainerPrompt");
 
-/*************************************************
- * Helper: extract the first JSON object from a string
- *************************************************/
 function extractFirstJsonObject(text) {
     if (!text) return null;
 
     let s = text.trim();
 
-    // Strip ```json fences if present
     if (s.startsWith("```")) {
         s = s.replace(/^```[a-zA-Z]*\s*/i, "");
         s = s.replace(/```$/i, "").trim();
     }
 
-    // Find the first { ... } block (simple brace scan)
     const start = s.indexOf("{");
     if (start === -1) return null;
 
@@ -31,35 +26,54 @@ function extractFirstJsonObject(text) {
         const ch = s[i];
         if (ch === "{") depth++;
         if (ch === "}") depth--;
-        if (depth === 0) {
-            return s.slice(start, i + 1);
-        }
+        if (depth === 0) return s.slice(start, i + 1);
     }
 
     return null;
 }
 
-/**
- * POST /api/explain
- */
 router.post("/explain", async (req, res) => {
     try {
         const {
-            productName,
+            mode = "single",
+            decisionGoal = "Is this right for me?",
+            category = "",
+            buyerContext = "",
+            productName = "",
             store = "",
             specs = "",
-            pageText = ""
+            pageText = "",
+            compareProducts = []
         } = req.body;
 
-        if (!productName || !productName.trim()) {
+        const normalizedMode = mode === "compare" ? "compare" : "single";
+
+        if (normalizedMode === "single" && !String(productName).trim()) {
             return res.status(400).json({ error: "Product name is required." });
         }
 
+        if (normalizedMode === "compare") {
+            const validCompare = Array.isArray(compareProducts)
+                && compareProducts.length >= 2
+                && compareProducts.every(p => p && typeof p.name === "string" && p.name.trim());
+
+            if (!validCompare) {
+                return res.status(400).json({
+                    error: "Compare mode requires two products with names."
+                });
+            }
+        }
+
         const prompt = buildExplainerPrompt({
+            mode: normalizedMode,
+            decisionGoal,
+            category,
+            buyerContext,
             productName,
             store,
             specs,
-            pageText
+            pageText,
+            compareProducts
         });
 
         const response = await openai.responses.create({
@@ -68,23 +82,18 @@ router.post("/explain", async (req, res) => {
         });
 
         const raw = response.output_text?.trim();
-
         if (!raw) {
             return res.status(500).json({ error: "No explanation generated." });
         }
 
-        // Try direct parse first
         try {
             return res.json(JSON.parse(raw));
         } catch (_) {
-            // Fall back to extracting JSON from extra text
             const jsonChunk = extractFirstJsonObject(raw);
 
             if (!jsonChunk) {
                 console.error("❌ No JSON object found in output:\n", raw);
-                return res.status(500).json({
-                    error: "Failed to parse explainer output.",
-                });
+                return res.status(500).json({ error: "Failed to parse explainer output." });
             }
 
             try {
@@ -92,9 +101,7 @@ router.post("/explain", async (req, res) => {
             } catch (err) {
                 console.error("❌ JSON parse failed even after extraction.\nRAW:\n", raw);
                 console.error("❌ EXTRACTED:\n", jsonChunk);
-                return res.status(500).json({
-                    error: "Failed to parse explainer output.",
-                });
+                return res.status(500).json({ error: "Failed to parse explainer output." });
             }
         }
 

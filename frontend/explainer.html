@@ -6,14 +6,12 @@
     <title>Gearbox – Explainer</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <!-- Reuse shared styles -->
     <link rel="stylesheet" href="css/home.css" />
     <link rel="stylesheet" href="css/explainer.css" />
 </head>
 
 <body>
 
-    <!-- NAV -->
     <header class="nav">
         <div class="nav-inner">
             <div class="logo">GEARBOX</div>
@@ -27,67 +25,174 @@
 
     <main class="explainer-main">
 
-        <!-- HEADER -->
         <section class="explainer-header">
-            <h1>Explain a product clearly</h1>
+            <h1>Find the right product faster</h1>
             <p class="explainer-subtitle">
-                Get a clear, human explanation of a product before you buy.
-                No sales pressure. No spec overload.
+                Gearbox turns specs, reviews, and product details into buying guidance you can actually use.
             </p>
-        </section>
 
-        <!-- INPUT CARD -->
-        <section class="explainer-input-section">
-            <div class="explainer-card">
-
-                <h2>Product details</h2>
-
-                <div class="explainer-field">
-                    <label for="product-name">Product name</label>
-                    <input id="product-name" type="text" placeholder="e.g. Trek Marlin 7, Patagonia Nano Puff" />
-                </div>
-
-                <div class="explainer-field">
-                    <label for="product-store">Store or brand (optional)</label>
-                    <input id="product-store" type="text" placeholder="e.g. REI, Backcountry, Specialized" />
-                </div>
-
-                <div class="explainer-field">
-                    <label for="product-link">Product link (optional)</label>
-                    <input id="product-link" type="url" placeholder="https://" />
-                </div>
-
-                <div class="explainer-field">
-                    <label for="product-specs">Specs or description (optional)</label>
-                    <textarea id="product-specs" rows="5"
-                        placeholder="Paste specs or product description here..."></textarea>
-                </div>
-
-                <button id="explainer-submit" class="primary-btn explainer-submit">
-                    Explain this product
-                </button>
-
+            <div class="decision-steps" aria-label="Decision process">
+                <div class="step-item"><span>1</span>Choose your goal</div>
+                <div class="step-item"><span>2</span>Add product details</div>
+                <div class="step-item"><span>3</span>Get buying guidance</div>
             </div>
         </section>
 
-        <!-- RESULTS PLACEHOLDER -->
-        <section class="explainer-results-section">
-            <div class="explainer-results-placeholder">
-                <p>
-                    Your explanation will appear here once the product is analyzed.
-                </p>
+        <section class="explainer-builder">
+            <div class="goal-selection">
+                <h2>What are you trying to figure out?</h2>
+                <div class="goal-card-grid" role="group" aria-label="Decision goal cards">
+                    <button class="goal-card active" type="button" data-goal="Is this right for me?" aria-pressed="true">Is this right for me?</button>
+                    <button class="goal-card" type="button" data-goal="Is it worth the price?" aria-pressed="false">Is it worth the price?</button>
+                    <button class="goal-card" type="button" data-goal="Explain the specs" aria-pressed="false">Explain the specs</button>
+                    <button class="goal-card" type="button" data-goal="Compare two products" aria-pressed="false">Compare two products</button>
+                    <button class="goal-card" type="button" data-goal="What should I know before buying?" aria-pressed="false">What should I know before buying?</button>
+                </div>
+            </div>
+
+            <div class="explainer-mode-switch" role="tablist" aria-label="Explainer mode">
+                <button class="mode-toggle active" data-mode="single" aria-selected="true">Single Product</button>
+                <button class="mode-toggle" data-mode="compare" aria-selected="false">Compare Products</button>
+            </div>
+
+            <div class="explainer-form-wrap">
+                <div class="explainer-form-panel" data-panel="single">
+                    <h3>Single product guidance</h3>
+                    <div class="explainer-field-grid">
+                        <div class="explainer-field">
+                            <label for="single-store">Store or brand</label>
+                            <select id="single-store">
+                                <option value="REI">REI</option>
+                                <option value="Backcountry">Backcountry</option>
+                                <option value="Dick’s Sporting Goods">Dick’s Sporting Goods</option>
+                                <option value="Scheels">Scheels</option>
+                                <option value="Specialized">Specialized</option>
+                                <option value="Trek">Trek</option>
+                                <option value="Patagonia">Patagonia</option>
+                                <option value="The North Face">The North Face</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="explainer-field">
+                            <label for="single-category">Product category</label>
+                            <select id="single-category">
+                                <option value="Bike">Bike</option>
+                                <option value="Shoes">Shoes</option>
+                                <option value="Jacket">Jacket</option>
+                                <option value="Backpack">Backpack</option>
+                                <option value="Tent">Tent</option>
+                                <option value="Skis">Skis</option>
+                                <option value="Snowboard">Snowboard</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+
+                        <div class="explainer-field full-width">
+                            <label for="single-product-name">Product name</label>
+                            <input id="single-product-name" type="text" placeholder="e.g. Trek Marlin 7, Patagonia Nano Puff" />
+                        </div>
+
+                        <div class="explainer-field full-width">
+                            <label for="single-product-link">Product link (optional)</label>
+                            <input id="single-product-link" type="url" placeholder="https://" />
+                        </div>
+
+                        <div class="explainer-field full-width">
+                            <label for="single-product-specs">Specs or description (optional)</label>
+                            <textarea id="single-product-specs" rows="5" placeholder="Paste specs, bullet points, or product details..."></textarea>
+                        </div>
+
+                        <div class="explainer-field full-width">
+                            <label for="single-buyer-context">Buyer context (optional)</label>
+                            <textarea id="single-buyer-context" rows="3" placeholder="Who is this for or how will it be used?"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="explainer-form-panel hidden compare-panel" data-panel="compare">
+                    <h3>Compare two products</h3>
+                    <div class="compare-grid">
+                        <article class="compare-card">
+                            <h4>Product A</h4>
+                            <div class="explainer-field">
+                                <label for="compare-a-name">Product name</label>
+                                <input id="compare-a-name" type="text" placeholder="e.g. Specialized Sirrus X 2.0" />
+                            </div>
+                            <div class="explainer-field">
+                                <label for="compare-a-store">Store or brand</label>
+                                <input id="compare-a-store" type="text" placeholder="e.g. Specialized" />
+                            </div>
+                            <div class="explainer-field">
+                                <label for="compare-a-link">Product link (optional)</label>
+                                <input id="compare-a-link" type="url" placeholder="https://" />
+                            </div>
+                            <div class="explainer-field">
+                                <label for="compare-a-specs">Specs or description (optional)</label>
+                                <textarea id="compare-a-specs" rows="5" placeholder="Paste Product A specs or description..."></textarea>
+                            </div>
+                        </article>
+
+                        <article class="compare-card">
+                            <h4>Product B</h4>
+                            <div class="explainer-field">
+                                <label for="compare-b-name">Product name</label>
+                                <input id="compare-b-name" type="text" placeholder="e.g. Trek FX 2 Disc" />
+                            </div>
+                            <div class="explainer-field">
+                                <label for="compare-b-store">Store or brand</label>
+                                <input id="compare-b-store" type="text" placeholder="e.g. Trek" />
+                            </div>
+                            <div class="explainer-field">
+                                <label for="compare-b-link">Product link (optional)</label>
+                                <input id="compare-b-link" type="url" placeholder="https://" />
+                            </div>
+                            <div class="explainer-field">
+                                <label for="compare-b-specs">Specs or description (optional)</label>
+                                <textarea id="compare-b-specs" rows="5" placeholder="Paste Product B specs or description..."></textarea>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+
+                <button id="explainer-submit" class="primary-btn explainer-submit">Get buying guidance</button>
+            </div>
+        </section>
+
+        <section class="explainer-results-section" id="explainer-results">
+            <div class="explainer-result-shell empty-shell">
+                <div class="result-heading">
+                    <h3>Decision dashboard preview</h3>
+                    <span class="result-mode-pill">Ready</span>
+                </div>
+                <p class="empty-copy">After you submit, Gearbox will organize your guidance into quick verdicts, fit guidance, spec priorities, and recommendation cards.</p>
+                <div class="explainer-result-grid">
+                    <article class="result-card"><h4>Quick verdict</h4><p>A concise first recommendation will appear here.</p></article>
+                    <article class="result-card"><h4>Who it’s for</h4><p>Clear buyer-fit guidance will appear here.</p></article>
+                    <article class="result-card"><h4>Not ideal for</h4><p>Potential mismatch warnings will appear here.</p></article>
+                    <article class="result-card"><h4>Specs that matter</h4><p>The most important specs to check will appear here.</p></article>
+                    <article class="result-card"><h4>Real-world feel</h4><p>What usage feels like day to day will appear here.</p></article>
+                    <article class="result-card"><h4>Recommendation</h4><p>A final decision summary will appear here.</p></article>
+                </div>
+            </div>
+
+            <div class="followup-wrap">
+                <p class="followup-title">Follow-up suggestions</p>
+                <div class="followup-chips">
+                    <button class="chip" type="button">Explain this simpler</button>
+                    <button class="chip" type="button">Is this beginner friendly?</button>
+                    <button class="chip" type="button">What are the downsides?</button>
+                    <button class="chip" type="button">What should I ask an employee?</button>
+                    <button class="chip" type="button">Compare to a cheaper option</button>
+                </div>
+                <p class="followup-response" id="followup-response"></p>
             </div>
         </section>
 
     </main>
 
-    <footer class="footer">
-        © Gearbox
-    </footer>
-
-    <!-- JS will be added later -->
+    <footer class="footer">© Gearbox</footer>
     <script src="script.js"></script>
-
 </body>
 
 </html>
