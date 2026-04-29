@@ -151,6 +151,9 @@
 .explainer-form-panel.hidden {
     display: none;
 }
+.explainer-field.hidden {
+    display: none;
+}
 
 .explainer-field-grid {
     display: grid;
@@ -299,6 +302,33 @@
     letter-spacing: 0.08em;
     color: #99b3f9;
     margin-bottom: 0.5rem;
+}
+
+.confidence-badge {
+    display: inline-flex;
+    border-radius: 999px;
+    padding: 0.22rem 0.62rem;
+    font-size: 0.78rem;
+    font-weight: 700;
+    margin-left: 0.45rem;
+}
+
+.confidence-high {
+    background: rgba(52, 211, 153, 0.2);
+    color: #9ef0d0;
+    border: 1px solid rgba(52, 211, 153, 0.45);
+}
+
+.confidence-medium {
+    background: rgba(250, 204, 21, 0.18);
+    color: #f8e58f;
+    border: 1px solid rgba(250, 204, 21, 0.4);
+}
+
+.confidence-low {
+    background: rgba(251, 113, 133, 0.18);
+    color: #ffc1ca;
+    border: 1px solid rgba(251, 113, 133, 0.45);
 }
 
 .result-card p,

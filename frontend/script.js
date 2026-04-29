@@ -144,6 +144,8 @@ function initExplainerMode() {
     const goalCards = document.querySelectorAll(".goal-card");
     const modeButtons = document.querySelectorAll(".mode-toggle");
     const modePanels = document.querySelectorAll(".explainer-form-panel");
+    const singleStoreSelect = document.getElementById("single-store");
+    const singleStoreOtherWrap = document.getElementById("single-store-other-wrap");
 
     let currentMode = "single";
     let currentGoal = EXPLAINER_GOALS[0];
@@ -221,18 +223,32 @@ function initExplainerMode() {
 
     setGoal(currentGoal);
     setMode(currentMode);
+
+    if (singleStoreSelect && singleStoreOtherWrap) {
+        const syncOtherStoreInput = () => {
+            singleStoreOtherWrap.classList.toggle("hidden", singleStoreSelect.value !== "Other");
+        };
+        singleStoreSelect.addEventListener("change", syncOtherStoreInput);
+        syncOtherStoreInput();
+    }
 }
 
 async function handleSingleExplainClick(goal) {
+    const selectedStore = document.getElementById("single-store")?.value || "";
+    const customOtherStore = document.getElementById("single-store-other")?.value.trim() || "";
+    const resolvedStore = selectedStore === "Other" ? customOtherStore : selectedStore;
+    const productLink = document.getElementById("single-product-link")?.value.trim() || "";
+    const linkContext = buildLinkContext(productLink);
+
     const payload = {
         mode: "single",
         decisionGoal: goal,
         category: document.getElementById("single-category")?.value || "",
         buyerContext: document.getElementById("single-buyer-context")?.value.trim() || "",
         productName: document.getElementById("single-product-name")?.value.trim() || "",
-        store: document.getElementById("single-store")?.value || "",
+        store: resolvedStore || "",
         specs: document.getElementById("single-product-specs")?.value.trim() || "",
-        pageText: document.getElementById("single-product-link")?.value.trim() || ""
+        pageText: [productLink, linkContext].filter(Boolean).join("\n")
     };
 
     if (!payload.productName) {
@@ -370,6 +386,8 @@ function renderSingleExplainerResult(data) {
                 ${buildResultCard("What you are paying for", listToHtml(listOrEmpty(data.whatYouArePayingFor), "No pricing-value guidance generated yet."))}
                 ${buildResultCard("Recommendation", `<p>${escapeHtml(paragraphOrFallback(data.recommendation, "No recommendation generated yet."))}</p>`) }
             </div>
+
+            ${renderDecisionChecklist(data)}
         </div>
         ${renderFollowupShell(data.followUpSuggestions)}
     `;
@@ -418,7 +436,7 @@ function renderFollowupShell(dynamicSuggestions = []) {
 
     return `
         <div class="followup-wrap">
-            <p class="followup-title">Follow-up suggestions</p>
+            <p class="followup-title">Quick follow-up questions</p>
             <div class="followup-chips">
                 ${chips.map(chip => `<button class="chip" type="button">${escapeHtml(chip)}</button>`).join("")}
             </div>
@@ -431,6 +449,46 @@ function renderFollowupShell(dynamicSuggestions = []) {
             </div>
         </div>
     `;
+}
+
+function renderDecisionChecklist(data) {
+    const confidenceRaw = paragraphOrFallback(data.confidenceLevel, "Low");
+    const confidence = ["High", "Medium", "Low"].includes(confidenceRaw) ? confidenceRaw : "Low";
+    const confidenceClass = `confidence-${confidence.toLowerCase()}`;
+
+    return `
+        <div class="result-card featured-card">
+            <h4>Decision Checklist <span class="confidence-badge ${confidenceClass}">${confidence}</span></h4>
+            <p><strong>Why confidence is this level:</strong> ${escapeHtml(paragraphOrFallback(data.confidenceReason, "Limited verified details were provided."))}</p>
+            <p><strong>Best next step:</strong> ${escapeHtml(paragraphOrFallback(data.bestNextStep, "Ask for key specs before purchasing."))}</p>
+            <p><strong>Missing information:</strong></p>
+            ${listToHtml(listOrEmpty(data.missingInfo), "No missing info identified.")}
+            <p><strong>Questions to ask before buying:</strong></p>
+            ${listToHtml(listOrEmpty(data.questionsToAsk), "No suggested questions generated.")}
+            <p><strong>Red flags:</strong></p>
+            ${listToHtml(listOrEmpty(data.redFlags), "No red flags generated.")}
+        </div>
+    `;
+}
+
+function buildLinkContext(link) {
+    if (!link) return "";
+    try {
+        const url = new URL(link);
+        const host = url.hostname.replace(/^www\./, "");
+        const hostLabel = host.split(".")[0]?.toUpperCase() || "";
+        const pathKeywords = url.pathname
+            .split("/")
+            .filter(Boolean)
+            .map(seg => seg.replace(/[-_]/g, " ").replace(/\.[a-z0-9]+$/i, ""))
+            .filter(Boolean)
+            .slice(-3)
+            .join(", ");
+
+        return `LINK CONTEXT: domain=${host}, inferredBrand=${hostLabel || "unknown"}, urlKeywords=${pathKeywords || "none"}`;
+    } catch (_) {
+        return `LINK CONTEXT: rawUrl=${link}`;
+    }
 }
 
 function renderFollowupTip(label, context) {

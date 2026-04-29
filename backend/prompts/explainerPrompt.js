@@ -58,6 +58,12 @@ OUTPUT REQUIREMENTS
   "specsThatMatter": ["..."],
   "realWorldFeel": ["..."],
   "whatYouArePayingFor": ["..."],
+  "confidenceLevel": "Low | Medium | High",
+  "confidenceReason": "...",
+  "missingInfo": ["..."],
+  "questionsToAsk": ["..."],
+  "redFlags": ["..."],
+  "bestNextStep": "...",
   "recommendation": "...",
   "followUpSuggestions": ["...", "...", "..."]
 }
@@ -92,6 +98,7 @@ STYLE RULES
   1) what you can infer with low confidence,
   2) what you cannot verify,
   3) which specs/details the shopper should check next before purchasing.
+  4) confidenceLevel must be "Low".
   Do not pretend missing specs are known.
 
 Now return JSON only.
