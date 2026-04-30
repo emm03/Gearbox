@@ -196,6 +196,39 @@ function initExplainerMode() {
     document.addEventListener("click", (e) => {
         const chip = e.target.closest(".chip");
         const clearBtn = e.target.closest("#clear-followup-btn");
+        const decisionActionBtn = e.target.closest("[data-decision-action]");
+
+        if (decisionActionBtn) {
+            const action = decisionActionBtn.dataset.decisionAction;
+            if (action === "compare-better-options") {
+                const singleProductName = document.getElementById("single-product-name")?.value.trim() || "";
+                const singleStore = document.getElementById("single-store")?.value || "";
+                const otherStore = document.getElementById("single-store-other")?.value.trim() || "";
+                const resolvedStore = singleStore === "Other" ? otherStore : singleStore;
+
+                setMode("compare");
+                setGoal("Compare two products");
+
+                const compareAName = document.getElementById("compare-a-name");
+                const compareAStore = document.getElementById("compare-a-store");
+                if (compareAName && singleProductName) compareAName.value = singleProductName;
+                if (compareAStore && resolvedStore) compareAStore.value = resolvedStore;
+
+                const comparePanel = document.querySelector('[data-panel="compare"]');
+                comparePanel?.scrollIntoView({ behavior: "smooth", block: "start" });
+                return;
+            }
+
+            if (action === "refine-needs") {
+                alert("Coming soon: guided prompts to refine your needs.");
+                return;
+            }
+
+            if (action === "learn-matters") {
+                alert("Coming soon: quick lessons on what matters most before buying.");
+                return;
+            }
+        }
 
         if (clearBtn) {
             clearFollowupAnswer();
@@ -377,6 +410,8 @@ function renderSingleExplainerResult(data) {
                 <p>${escapeHtml(paragraphOrFallback(data.quickVerdict, "No verdict generated yet."))}</p>
             </div>
 
+            ${renderDecisionPath(data)}
+
             <div class="explainer-result-grid">
                 ${buildResultCard("Plain English summary", `<p>${escapeHtml(paragraphOrFallback(data.plainEnglishSummary, "No summary generated yet."))}</p>`) }
                 ${buildResultCard("Who it’s for", listToHtml(listOrEmpty(data.bestFor), "No audience guidance generated yet."))}
@@ -389,7 +424,7 @@ function renderSingleExplainerResult(data) {
 
             ${renderDecisionChecklist(data)}
         </div>
-        ${renderFollowupShell(data.followUpSuggestions)}
+        ${renderFollowupShell(data.followUpSuggestions, true)}
     `;
 }
 
@@ -426,7 +461,7 @@ function renderCompareExplainerResult(data, fallbackProducts = []) {
     `;
 }
 
-function renderFollowupShell(dynamicSuggestions = []) {
+function renderFollowupShell(dynamicSuggestions = [], isSecondary = false) {
     const chipSet = [...dynamicSuggestions, ...DEFAULT_FOLLOW_UPS]
         .filter(Boolean)
         .filter((value, idx, arr) => arr.indexOf(value) === idx)
@@ -435,8 +470,8 @@ function renderFollowupShell(dynamicSuggestions = []) {
     const chips = chipSet.length ? chipSet : DEFAULT_FOLLOW_UPS;
 
     return `
-        <div class="followup-wrap">
-            <p class="followup-title">Quick follow-up questions</p>
+        <div class="followup-wrap ${isSecondary ? "secondary-followup" : ""}">
+            <p class="followup-title">${isSecondary ? "Optional follow-up questions" : "Quick follow-up questions"}</p>
             <div class="followup-chips">
                 ${chips.map(chip => `<button class="chip" type="button">${escapeHtml(chip)}</button>`).join("")}
             </div>
@@ -449,6 +484,56 @@ function renderFollowupShell(dynamicSuggestions = []) {
             </div>
         </div>
     `;
+}
+
+function renderDecisionPath(data) {
+    const finalDecision = inferDecisionLabel(data.quickVerdict, data.recommendation);
+    const reasons = [
+        paragraphOrFallback(data.plainEnglishSummary, ""),
+        paragraphOrFallback(data.whatActuallyMatters, ""),
+        ...listOrEmpty(data.redFlags)
+    ].filter(Boolean).slice(0, 3);
+    const checks = [
+        ...listOrEmpty(data.missingInfo),
+        ...listOrEmpty(data.questionsToAsk)
+    ];
+
+    return `
+        <article class="result-card featured-card decision-path-card">
+            <h4>Decision Path</h4>
+            <div class="decision-path-block">
+                <p class="decision-path-label">Final decision</p>
+                <p><span class="decision-pill decision-${finalDecision.key}">${finalDecision.label}</span></p>
+            </div>
+            <div class="decision-path-block">
+                <p class="decision-path-label">Why this decision</p>
+                ${listToHtml(reasons, "Not enough evidence yet. Add product details and buyer context for a stronger recommendation.")}
+            </div>
+            <div class="decision-path-block">
+                <p class="decision-path-label">What to check before buying</p>
+                ${listToHtml(checks, "Ask for missing specs and return policy details before buying.")}
+            </div>
+            <div class="decision-path-block">
+                <p class="decision-path-label">Next step (most important)</p>
+                <div class="decision-actions">
+                    <button class="decision-btn primary" type="button" data-decision-action="compare-better-options">Compare with better options</button>
+                    <button class="decision-btn" type="button" data-decision-action="refine-needs">Refine my needs</button>
+                    <button class="decision-btn" type="button" data-decision-action="learn-matters">Learn what matters</button>
+                </div>
+            </div>
+        </article>
+    `;
+}
+
+function inferDecisionLabel(quickVerdict, recommendation) {
+    const joined = `${quickVerdict || ""} ${recommendation || ""}`.toLowerCase();
+    if (/(not recommended|avoid|skip|poor fit|don'?t buy|bad fit)/.test(joined)) {
+        return { key: "not-recommended", label: "Not recommended" };
+    }
+    if (/(good fit|strong fit|recommended|buy|worth it|great option)/.test(joined)) {
+        return { key: "good-fit", label: "Good fit" };
+    }
+    return { key: "maybe", label: "Maybe" };
 }
 
 function renderDecisionChecklist(data) {
