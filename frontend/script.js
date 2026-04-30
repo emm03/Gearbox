@@ -565,6 +565,75 @@ function inferDecisionLabel(quickVerdict, recommendation) {
     return { key: "maybe", label: "Maybe" };
 }
 
+function renderDecisionInlinePanel(mode) {
+    const panel = document.getElementById("decision-inline-panel");
+    if (!panel) return;
+
+    if (mode === "refine") {
+        panel.innerHTML = `
+            <p class="decision-inline-title">Refine my needs</p>
+            <div class="decision-actions">
+                <button class="decision-btn" type="button" data-refine-focus="comfort">Comfort matters most</button>
+                <button class="decision-btn" type="button" data-refine-focus="budget">Budget matters most</button>
+                <button class="decision-btn" type="button" data-refine-focus="performance">Performance matters most</button>
+            </div>
+            <p class="decision-inline-note">Pick one to tighten guidance. We will update buyer context and refresh the recommendation.</p>
+        `;
+        panel.classList.remove("hidden");
+        return;
+    }
+
+    const category = document.getElementById("single-category")?.value || "";
+    const bullets = getCategoryLearningBullets(category);
+    panel.innerHTML = `
+        <p class="decision-inline-title">What matters most for ${escapeHtml(category || "this category")}</p>
+        <ul>${bullets.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+    `;
+    panel.classList.remove("hidden");
+}
+
+async function applyRefinementFocus(focus) {
+    const buyerContextEl = document.getElementById("single-buyer-context");
+    if (!buyerContextEl) return;
+
+    const notes = {
+        comfort: "Priority: Comfort matters most.",
+        budget: "Priority: Budget matters most.",
+        performance: "Priority: Performance matters most."
+    };
+    const note = notes[focus];
+    if (!note) return;
+
+    if (!buyerContextEl.value.includes(note)) {
+        buyerContextEl.value = [buyerContextEl.value.trim(), note].filter(Boolean).join("\n");
+    }
+
+    const panel = document.getElementById("decision-inline-panel");
+    if (panel) {
+        panel.innerHTML += `<p class="decision-inline-note">Refreshing guidance with your new priority: ${escapeHtml(note)}</p>`;
+    }
+
+    await handleSingleExplainClick("Is this right for me?");
+}
+
+function getCategoryLearningBullets(category) {
+    if (category === "Bike") {
+        return ["Fit and frame size", "Brake type", "Tire width", "Gearing range", "Intended terrain"];
+    }
+    return ["Fit for your use case", "Comfort over long sessions", "Durability and maintenance", "Core performance specs", "Total ownership cost"];
+}
+
+function inferDecisionLabel(quickVerdict, recommendation) {
+    const joined = `${quickVerdict || ""} ${recommendation || ""}`.toLowerCase();
+    if (/(not recommended|avoid|skip|poor fit|don'?t buy|bad fit)/.test(joined)) {
+        return { key: "not-recommended", label: "Not recommended" };
+    }
+    if (/(good fit|strong fit|recommended|buy|worth it|great option)/.test(joined)) {
+        return { key: "good-fit", label: "Good fit" };
+    }
+    return { key: "maybe", label: "Maybe" };
+}
+
 function renderDecisionChecklist(data) {
     const confidenceRaw = paragraphOrFallback(data.confidenceLevel, "Low");
     const confidence = ["High", "Medium", "Low"].includes(confidenceRaw) ? confidenceRaw : "Low";
@@ -723,6 +792,9 @@ function activateLearnTab(tabId) {
 let currentLearningData = null;
 let currentFlashcardIndex = 0;
 let currentFlashcardFlipped = false;
+let currentQuizIndex = 0;
+let currentQuizScore = 0;
+let currentQuizAnswered = false;
 
 /*************************************************
  * LEARN MODE
@@ -738,11 +810,14 @@ function initLearnMode() {
 async function handleGenerateLearning() {
     const store = document.getElementById("store-select")?.value || "";
     const department = document.getElementById("department-select")?.value || "";
+    const productName = document.getElementById("learn-product-name")?.value.trim() || "";
+    const employeeContext = document.getElementById("employee-context")?.value.trim() || "";
     const specs = document.getElementById("product-specs")?.value.trim();
     const btn = document.getElementById("generate-learning-btn");
+    const status = document.getElementById("learn-status");
 
     if (!specs) {
-        alert("Paste specs first.");
+        if (status) status.innerHTML = `<p class="learn-inline-error">Please paste product specs or details before generating.</p>`;
         return;
     }
 
@@ -753,6 +828,7 @@ async function handleGenerateLearning() {
         btn.disabled = true;
         btn.textContent = "Generating...";
     }
+    if (status) status.innerHTML = `<p class="learn-inline-loading">Generating training module...</p>`;
 
     if (flashcardsContainer) {
         flashcardsContainer.innerHTML = `<p>Generating flashcards...</p>`;
@@ -766,7 +842,7 @@ async function handleGenerateLearning() {
         const res = await fetch("http://localhost:4000/api/learn", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ store, department, specs })
+            body: JSON.stringify({ store, department, specs, productName, employeeContext })
         });
 
         const data = await res.json();
@@ -778,20 +854,25 @@ async function handleGenerateLearning() {
         currentLearningData = data;
         currentFlashcardIndex = 0;
         currentFlashcardFlipped = false;
+        currentQuizIndex = 0;
+        currentQuizScore = 0;
+        currentQuizAnswered = false;
 
         renderLearningModule(data);
+        if (status) status.innerHTML = `<p class="learn-inline-success">Training module ready. Start with flashcards.</p>`;
         activateLearnTab("flashcards-tab");
 
     } catch (err) {
         console.error(err);
 
         if (flashcardsContainer) {
-            flashcardsContainer.innerHTML = `<p>Something went wrong.</p>`;
+            flashcardsContainer.innerHTML = `<p class="learn-inline-error">Could not generate flashcards right now.</p>`;
         }
 
         if (quizContainer) {
-            quizContainer.innerHTML = `<p>Something went wrong.</p>`;
+            quizContainer.innerHTML = `<p class="learn-inline-error">Could not generate quiz right now.</p>`;
         }
+        if (status) status.innerHTML = `<p class="learn-inline-error">Something went wrong while generating the module.</p>`;
     } finally {
         if (btn) {
             btn.disabled = false;
@@ -805,8 +886,36 @@ async function handleGenerateLearning() {
  *************************************************/
 
 function renderLearningModule(data) {
+    renderTrainingSummary(data);
     renderSingleFlashcardView(data);
     renderQuizView(data);
+}
+
+function renderTrainingSummary(data) {
+    const container = document.getElementById("training-summary");
+    if (!container) return;
+
+    const overview = paragraphOrFallback(data.summary || data.productOverview, "Overview will appear after generation.");
+    const talkingPoints = listOrEmpty(data.topTalkingPoints || data.talkingPoints);
+    const objections = listOrEmpty(data.commonObjections || data.objections);
+    const fit = listOrEmpty(data.bestFit || data.bestFor);
+    const notFit = listOrEmpty(data.notBestFit || data.notIdealFor);
+
+    container.innerHTML = `
+        <article class="learn-summary-card">
+            <h3>Training Summary</h3>
+            <p>${escapeHtml(overview)}</p>
+            <h4>Top customer talking points</h4>
+            ${listToHtml(talkingPoints, "No talking points generated yet.")}
+            <h4>Common objections + responses</h4>
+            ${listToHtml(objections, "No objections generated yet.")}
+            <h4>Best fit / Not best fit</h4>
+            <p><strong>Best fit:</strong></p>
+            ${listToHtml(fit, "No best-fit guidance generated yet.")}
+            <p><strong>Not best fit:</strong></p>
+            ${listToHtml(notFit, "No mismatch guidance generated yet.")}
+        </article>
+    `;
 }
 
 function renderSingleFlashcardView(data) {
@@ -827,23 +936,16 @@ function renderSingleFlashcardView(data) {
     const card = flashcards[currentFlashcardIndex];
 
     flashcardsContainer.innerHTML = `
-        <h3>Summary</h3>
-        <p>${data.summary || ""}</p>
-
-        <h3>Flashcards</h3>
-
-        <div class="flashcard-progress">
-            ${currentFlashcardIndex + 1} / ${flashcards.length}
-        </div>
+        <div class="flashcard-progress">Card ${currentFlashcardIndex + 1} of ${flashcards.length}</div>
 
         <div class="flashcard-viewer">
             <div class="flashcard-card ${currentFlashcardFlipped ? "flipped" : ""}" id="active-flashcard">
                 <div class="flashcard-face flashcard-front">
-                    <div>${card.front}</div>
+                    <div>${escapeHtml(card.front || "No prompt generated.")}</div>
                     <div class="flashcard-hint">Click to flip</div>
                 </div>
                 <div class="flashcard-face flashcard-back">
-                    <div>${card.back}</div>
+                    <div>${escapeHtml(card.back || "No answer generated.")}</div>
                 </div>
             </div>
         </div>
@@ -900,18 +1002,68 @@ function renderSingleFlashcardView(data) {
 function renderQuizView(data) {
     const quizContainer = document.getElementById("quiz-container");
     if (!quizContainer) return;
+    const quiz = Array.isArray(data.quiz) ? data.quiz : [];
+    if (!quiz.length) {
+        quizContainer.innerHTML = `<p>No quiz questions were generated.</p>`;
+        return;
+    }
 
-    quizContainer.innerHTML = `
-        <h3>Quiz</h3>
-        ${(data.quiz || []).map((q, i) => `
-            <div class="quiz-question">
-                <p><strong>${i + 1}. ${q.question}</strong></p>
-                ${(q.options || []).map(o => `<div>${o}</div>`).join("")}
-                <p><em>Correct: ${(q.options || [])[q.correctIndex] || ""}</em></p>
-                <p>${q.explanation || ""}</p>
+    if (currentQuizIndex >= quiz.length) {
+        quizContainer.innerHTML = `
+            <div class="quiz-score-card">
+                <h3>Quiz Complete</h3>
+                <p id="quiz-score">Score: ${currentQuizScore} / ${quiz.length}</p>
+                <button id="quiz-restart-btn" class="decision-btn primary" type="button">Retake quiz</button>
             </div>
-        `).join("")}
+        `;
+        document.getElementById("quiz-restart-btn")?.addEventListener("click", () => {
+            currentQuizIndex = 0;
+            currentQuizScore = 0;
+            currentQuizAnswered = false;
+            renderQuizView(currentLearningData);
+        });
+        return;
+    }
+
+    const q = quiz[currentQuizIndex] || {};
+    const options = Array.isArray(q.options) ? q.options : [];
+    quizContainer.innerHTML = `
+        <div class="quiz-question ${currentQuizAnswered ? "answered" : ""}">
+            <p class="quiz-progress">Question ${currentQuizIndex + 1} of ${quiz.length}</p>
+            <p><strong>${escapeHtml(q.question || "No question generated.")}</strong></p>
+            <div class="quiz-options">
+                ${options.map((opt, idx) => `<button class="quiz-option" type="button" data-quiz-option="${idx}" ${currentQuizAnswered ? "disabled" : ""}>${escapeHtml(opt)}</button>`).join("")}
+            </div>
+            <p class="quiz-feedback" id="quiz-feedback"></p>
+            <button id="quiz-next-btn" class="decision-btn primary ${currentQuizAnswered ? "" : "hidden"}" type="button">Next question</button>
+        </div>
     `;
+
+    const feedback = document.getElementById("quiz-feedback");
+    quizContainer.querySelectorAll("[data-quiz-option]").forEach(btn => {
+        btn.addEventListener("click", () => {
+            if (currentQuizAnswered) return;
+            currentQuizAnswered = true;
+            const selected = Number(btn.dataset.quizOption);
+            const correct = Number(q.correctIndex);
+            const isCorrect = selected === correct;
+            if (isCorrect) currentQuizScore += 1;
+            btn.classList.add(isCorrect ? "correct" : "incorrect");
+            const correctBtn = quizContainer.querySelector(`[data-quiz-option="${correct}"]`);
+            correctBtn?.classList.add("correct");
+            quizContainer.querySelectorAll("[data-quiz-option]").forEach(optionBtn => optionBtn.disabled = true);
+            if (feedback) feedback.textContent = isCorrect
+                ? "Correct. Nice explanation-ready answer."
+                : `Not quite. Correct answer: ${options[correct] || "N/A"}.`;
+            document.getElementById("quiz-next-btn")?.classList.remove("hidden");
+        });
+    });
+
+    document.getElementById("quiz-next-btn")?.addEventListener("click", () => {
+        currentQuizIndex += 1;
+        currentQuizAnswered = false;
+        renderQuizView(currentLearningData);
+    });
 }
 
 function renderFlashcardCompleteState() {
