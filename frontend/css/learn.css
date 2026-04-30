@@ -4,9 +4,10 @@ body {
 }
 
 .learn-main {
-    max-width: 1120px;
+    width: 100%;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 4.5rem 1.4rem 5rem;
+    padding: 4.5rem 1.8rem 5rem;
 }
 
 .learn-hero {
@@ -60,6 +61,11 @@ body {
 .learn-tab-content { display:none; }
 .learn-tab-content.active { display:block; }
 .setup-grid { display:grid; grid-template-columns: 1.1fr 0.9fr; gap: 1rem; align-items: start; }
+.training-preview { min-width: 0; }
+.training-dashboard { display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:0.6rem; margin-bottom:0.7rem; }
+.dashboard-stat { border:1px solid rgba(127,161,255,.24); border-radius:12px; background:rgba(12,23,50,.74); padding:0.65rem; }
+.dashboard-stat p { color:#a8bce9; font-size:0.78rem; margin-bottom:0.25rem; text-transform:uppercase; letter-spacing:0.06em; }
+.dashboard-stat h3 { margin:0; font-size:1.15rem; }
 
 .panel, .flashcards-panel, .quiz-panel, .learn-summary-card {
     border: 1px solid rgba(127, 161, 255, 0.2);
@@ -124,8 +130,12 @@ body {
 .quiz-feedback { min-height: 1.4rem; margin-top: 0.6rem; color:#d8e2fb; }
 .hidden { display:none; }
 
+#flashcards-container, #quiz-container { max-width: 880px; margin: 0.25rem auto 0; }
+.quiz-panel { max-width: 980px; margin: 0 auto; }
+.quiz-score-card, .quiz-question { max-width: 860px; margin: 0 auto; }
+
 @media (max-width: 760px) {
-    .setup-grid, .summary-grid { grid-template-columns: 1fr; }
+    .setup-grid, .summary-grid, .training-dashboard { grid-template-columns: 1fr; }
     .form-row.two-col { grid-template-columns: 1fr; }
     .flashcard-card { min-height: 280px; }
     .flashcard-face div:first-child { font-size: 1.05rem; }

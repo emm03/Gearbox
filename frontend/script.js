@@ -608,6 +608,75 @@ function inferDecisionLabel(quickVerdict, recommendation) {
     return { key: "maybe", label: "Maybe" };
 }
 
+function renderDecisionInlinePanel(mode) {
+    const panel = document.getElementById("decision-inline-panel");
+    if (!panel) return;
+
+    if (mode === "refine") {
+        panel.innerHTML = `
+            <p class="decision-inline-title">Refine my needs</p>
+            <div class="decision-actions">
+                <button class="decision-btn" type="button" data-refine-focus="comfort">Comfort matters most</button>
+                <button class="decision-btn" type="button" data-refine-focus="budget">Budget matters most</button>
+                <button class="decision-btn" type="button" data-refine-focus="performance">Performance matters most</button>
+            </div>
+            <p class="decision-inline-note">Pick one to tighten guidance. We will update buyer context and refresh the recommendation.</p>
+        `;
+        panel.classList.remove("hidden");
+        return;
+    }
+
+    const category = document.getElementById("single-category")?.value || "";
+    const bullets = getCategoryLearningBullets(category);
+    panel.innerHTML = `
+        <p class="decision-inline-title">What matters most for ${escapeHtml(category || "this category")}</p>
+        <ul>${bullets.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+    `;
+    panel.classList.remove("hidden");
+}
+
+async function applyRefinementFocus(focus) {
+    const buyerContextEl = document.getElementById("single-buyer-context");
+    if (!buyerContextEl) return;
+
+    const notes = {
+        comfort: "Priority: Comfort matters most.",
+        budget: "Priority: Budget matters most.",
+        performance: "Priority: Performance matters most."
+    };
+    const note = notes[focus];
+    if (!note) return;
+
+    if (!buyerContextEl.value.includes(note)) {
+        buyerContextEl.value = [buyerContextEl.value.trim(), note].filter(Boolean).join("\n");
+    }
+
+    const panel = document.getElementById("decision-inline-panel");
+    if (panel) {
+        panel.innerHTML += `<p class="decision-inline-note">Refreshing guidance with your new priority: ${escapeHtml(note)}</p>`;
+    }
+
+    await handleSingleExplainClick("Is this right for me?");
+}
+
+function getCategoryLearningBullets(category) {
+    if (category === "Bike") {
+        return ["Fit and frame size", "Brake type", "Tire width", "Gearing range", "Intended terrain"];
+    }
+    return ["Fit for your use case", "Comfort over long sessions", "Durability and maintenance", "Core performance specs", "Total ownership cost"];
+}
+
+function inferDecisionLabel(quickVerdict, recommendation) {
+    const joined = `${quickVerdict || ""} ${recommendation || ""}`.toLowerCase();
+    if (/(not recommended|avoid|skip|poor fit|don'?t buy|bad fit)/.test(joined)) {
+        return { key: "not-recommended", label: "Not recommended" };
+    }
+    if (/(good fit|strong fit|recommended|buy|worth it|great option)/.test(joined)) {
+        return { key: "good-fit", label: "Good fit" };
+    }
+    return { key: "maybe", label: "Maybe" };
+}
+
 function renderDecisionChecklist(data) {
     const confidenceRaw = paragraphOrFallback(data.confidenceLevel, "Low");
     const confidence = ["High", "Medium", "Low"].includes(confidenceRaw) ? confidenceRaw : "Low";
@@ -862,9 +931,25 @@ async function handleGenerateLearning() {
  *************************************************/
 
 function renderLearningModule(data) {
+    renderTrainingDashboard(data);
     renderTrainingSummary(data);
     renderSingleFlashcardView(data);
     renderQuizView(data);
+}
+
+function renderTrainingDashboard(data) {
+    const dashboard = document.getElementById("training-dashboard");
+    if (!dashboard) return;
+    const flashcards = Array.isArray(data.flashcards) ? data.flashcards : [];
+    const quiz = Array.isArray(data.quiz) ? data.quiz : [];
+    const masteredCount = Object.values(flashcardMastery).filter(v => v === "mastered").length;
+    const completion = flashcards.length ? Math.round((masteredCount / flashcards.length) * 100) : 0;
+    dashboard.innerHTML = `
+        <article class="dashboard-stat"><p>Cards generated</p><h3>${flashcards.length}</h3></article>
+        <article class="dashboard-stat"><p>Quiz questions</p><h3>${quiz.length}</h3></article>
+        <article class="dashboard-stat"><p>Mastered count</p><h3>${masteredCount}</h3></article>
+        <article class="dashboard-stat"><p>Completion</p><h3>${completion}%</h3></article>
+    `;
 }
 
 function renderTrainingSummary(data) {
@@ -918,7 +1003,7 @@ function renderSingleFlashcardView(data) {
             <div class="flashcard-card ${currentFlashcardFlipped ? "flipped" : ""}" id="active-flashcard">
                 <div class="flashcard-face flashcard-front">
                     <div>${escapeHtml(card.front || "No prompt generated.")}</div>
-                    <div class="flashcard-hint">Click to flip</div>
+                    <div class="flashcard-hint">Use arrow keys or click to flip</div>
                 </div>
                 <div class="flashcard-face flashcard-back">
                     <div>${escapeHtml(card.back || "No answer generated.")}</div>
@@ -981,12 +1066,31 @@ function renderSingleFlashcardView(data) {
     }
     if (masteredBtn) masteredBtn.addEventListener("click", () => {
         flashcardMastery[currentFlashcardIndex] = "mastered";
+        renderTrainingDashboard(currentLearningData);
         renderSingleFlashcardView(currentLearningData);
     });
     if (learningBtn) learningBtn.addEventListener("click", () => {
         flashcardMastery[currentFlashcardIndex] = "learning";
+        renderTrainingDashboard(currentLearningData);
         renderSingleFlashcardView(currentLearningData);
     });
+
+    document.onkeydown = (event) => {
+        if (!currentLearningData) return;
+        if (event.key === "ArrowLeft" && currentFlashcardIndex > 0) {
+            currentFlashcardIndex -= 1;
+            currentFlashcardFlipped = false;
+            renderSingleFlashcardView(currentLearningData);
+        } else if (event.key === "ArrowRight" && currentFlashcardIndex < flashcards.length - 1) {
+            currentFlashcardIndex += 1;
+            currentFlashcardFlipped = false;
+            renderSingleFlashcardView(currentLearningData);
+        } else if (event.key === " " || event.key === "Enter") {
+            event.preventDefault();
+            currentFlashcardFlipped = !currentFlashcardFlipped;
+            renderSingleFlashcardView(currentLearningData);
+        }
+    };
 }
 
 function renderQuizView(data) {
