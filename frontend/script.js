@@ -565,6 +565,56 @@ function inferDecisionLabel(quickVerdict, recommendation) {
     return { key: "maybe", label: "Maybe" };
 }
 
+function renderDecisionPath(data) {
+    const finalDecision = inferDecisionLabel(data.quickVerdict, data.recommendation);
+    const reasons = [
+        paragraphOrFallback(data.plainEnglishSummary, ""),
+        paragraphOrFallback(data.whatActuallyMatters, ""),
+        ...listOrEmpty(data.redFlags)
+    ].filter(Boolean).slice(0, 3);
+    const checks = [
+        ...listOrEmpty(data.missingInfo),
+        ...listOrEmpty(data.questionsToAsk)
+    ];
+
+    return `
+        <article class="result-card featured-card decision-path-card">
+            <h4>Decision Path</h4>
+            <div class="decision-path-block">
+                <p class="decision-path-label">Final decision</p>
+                <p><span class="decision-pill decision-${finalDecision.key}">${finalDecision.label}</span></p>
+            </div>
+            <div class="decision-path-block">
+                <p class="decision-path-label">Why this decision</p>
+                ${listToHtml(reasons, "Not enough evidence yet. Add product details and buyer context for a stronger recommendation.")}
+            </div>
+            <div class="decision-path-block">
+                <p class="decision-path-label">What to check before buying</p>
+                ${listToHtml(checks, "Ask for missing specs and return policy details before buying.")}
+            </div>
+            <div class="decision-path-block">
+                <p class="decision-path-label">Next step (most important)</p>
+                <div class="decision-actions">
+                    <button class="decision-btn primary" type="button" data-decision-action="compare-better-options">Compare with better options</button>
+                    <button class="decision-btn" type="button" data-decision-action="refine-needs">Refine my needs</button>
+                    <button class="decision-btn" type="button" data-decision-action="learn-matters">Learn what matters</button>
+                </div>
+            </div>
+        </article>
+    `;
+}
+
+function inferDecisionLabel(quickVerdict, recommendation) {
+    const joined = `${quickVerdict || ""} ${recommendation || ""}`.toLowerCase();
+    if (/(not recommended|avoid|skip|poor fit|don'?t buy|bad fit)/.test(joined)) {
+        return { key: "not-recommended", label: "Not recommended" };
+    }
+    if (/(good fit|strong fit|recommended|buy|worth it|great option)/.test(joined)) {
+        return { key: "good-fit", label: "Good fit" };
+    }
+    return { key: "maybe", label: "Maybe" };
+}
+
 function renderDecisionChecklist(data) {
     const confidenceRaw = paragraphOrFallback(data.confidenceLevel, "Low");
     const confidence = ["High", "Medium", "Low"].includes(confidenceRaw) ? confidenceRaw : "Low";
