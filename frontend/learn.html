@@ -1,26 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Gearbox – Learn Mode</title>
-
-    <!-- New modular CSS files -->
     <link rel="stylesheet" href="css/global.css" />
     <link rel="stylesheet" href="css/header.css" />
     <link rel="stylesheet" href="css/learn.css" />
 </head>
-
 <body>
-
-    <!-- Shared Header -->
     <header>
         <div class="header-inner">
             <div class="logo-title">
                 <span class="logo-mark">G</span>
                 <span class="logo-text">Gearbox</span>
             </div>
-
             <nav class="main-nav">
                 <a href="index.html" class="nav-link">Home</a>
                 <a href="explainer.html" class="nav-link">Product Explainer</a>
@@ -29,84 +23,83 @@
         </div>
     </header>
 
-    <!-- Main Learn Mode Wrapper -->
     <main class="learn-main">
+        <section class="learn-hero">
+            <p class="hero-eyebrow">Employee Training</p>
+            <h1>Train faster. Explain products like a pro.</h1>
+            <p>Build a module from real specs, flip through flashcards, then run a quick customer-facing quiz.</p>
+        </section>
 
-        <!-- Learn Mode Tabs + Content Panels -->
         <section class="learn-panel">
-
-            <!-- Tabs -->
             <div class="learn-tabs">
                 <button class="learn-tab active" data-tab="setup-tab">Setup</button>
                 <button class="learn-tab" data-tab="flashcards-tab">Flashcards</button>
                 <button class="learn-tab" data-tab="quiz-tab">Quiz</button>
             </div>
 
-            <!-- TAB 1: SETUP -->
             <div class="learn-tab-content active" id="setup-tab">
                 <div class="panel setup-panel">
-                    <h2>Setup Your Learning Module</h2>
-                    <p class="muted">
-                        Choose the store and department, paste the equipment’s product specs,
-                        then click <strong>Generate Learning Module</strong>.
-                    </p>
-
+                    <h2>Module setup</h2>
+                    <p class="muted">Enter product details to generate training content.</p>
                     <div class="learn-form">
-
-                        <!-- Store + Department Row -->
-                        <div class="form-row">
-                            <label for="store-select">Store</label>
-                            <select id="store-select">
-                                <option value="rei">REI</option>
-                                <option value="generic">Generic Store</option>
-                            </select>
-
-                            <label for="department-select">Department</label>
-                            <select id="department-select">
-                                <option value="bikes">Bikes</option>
-                                <option value="footwear">Footwear</option>
-                                <option value="camping">Camping</option>
-                            </select>
+                        <div class="form-row two-col">
+                            <div>
+                                <label for="store-select">Store</label>
+                                <select id="store-select">
+                                    <option value="rei">REI</option>
+                                    <option value="generic">Generic Store</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label for="department-select">Department</label>
+                                <select id="department-select">
+                                    <option value="bikes">Bikes</option>
+                                    <option value="footwear">Footwear</option>
+                                    <option value="camping">Camping</option>
+                                </select>
+                            </div>
                         </div>
 
-                        <!-- Specs Input -->
-                        <label for="product-specs">Product Specs</label>
-                        <textarea id="product-specs" rows="8"
-                            placeholder="Paste the technical specs here..."></textarea>
+                        <label for="learn-product-name">Product name</label>
+                        <input id="learn-product-name" type="text" placeholder="e.g. Trek FX 2 Disc" />
 
-                        <button id="generate-learning-btn" class="btn-primary">
-                            Generate Learning Module
-                        </button>
+                        <label for="product-specs">Specs / product details</label>
+                        <textarea id="product-specs" rows="8" placeholder="Paste technical specs, feature bullets, materials, fit notes, and pricing details..."></textarea>
+
+                        <label for="employee-context">Employee context (optional)</label>
+                        <textarea id="employee-context" rows="3" placeholder="e.g. I need to explain this to first-time commuters."></textarea>
+
+                        <button id="generate-learning-btn" class="btn-primary">Generate Learning Module</button>
+                        <div id="learn-status" class="learn-status"><p>Tip: richer specs produce better cards and quiz questions.</p></div>
                     </div>
+                </div>
+
+                <div id="training-summary" class="training-summary">
+                    <article class="learn-summary-card empty">
+                        <h3>Training Summary</h3>
+                        <p>Generate a module to get overview, talking points, objections, and fit guidance.</p>
+                    </article>
                 </div>
             </div>
 
-            <!-- TAB 2: FLASHCARDS -->
             <div class="learn-tab-content" id="flashcards-tab">
                 <div class="flashcards-panel">
                     <h2>Flashcards</h2>
-                    <p class="muted">
-                        Generate a module first, then flip through each card to study the gear.
-                    </p>
-                    <div id="flashcards-container"></div>
+                    <p class="muted">Click the card to flip. Use previous/next to move through the deck.</p>
+                    <div id="flashcards-container"><p class="empty-state">No deck yet. Generate a module in Setup.</p></div>
                 </div>
             </div>
 
-            <!-- TAB 3: QUIZ -->
             <div class="learn-tab-content" id="quiz-tab">
                 <div class="quiz-panel">
                     <h2>Quiz</h2>
-                    <p class="muted">
-                        Test your product knowledge and check how ready you are to explain the gear.
-                    </p>
-                    <div id="quiz-container"></div>
+                    <p class="muted">Answer one question at a time and get instant feedback.</p>
+                    <div id="quiz-container"><p class="empty-state">No quiz yet. Generate a module in Setup.</p></div>
                 </div>
             </div>
-
         </section>
     </main>
 
     <script src="script.js"></script>
 </body>
-
 </html>
