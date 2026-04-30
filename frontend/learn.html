@@ -38,10 +38,11 @@
             </div>
 
             <div class="learn-tab-content active" id="setup-tab">
-                <div class="panel setup-panel">
-                    <h2>Module setup</h2>
-                    <p class="muted">Enter product details to generate training content.</p>
-                    <div class="learn-form">
+                <div class="setup-grid">
+                    <div class="panel setup-panel">
+                        <h2>Module setup</h2>
+                        <p class="muted">Enter product details to generate training content.</p>
+                        <div class="learn-form">
                         <div class="form-row two-col">
                             <div>
                                 <label for="store-select">Store</label>
@@ -69,8 +70,27 @@
                         <label for="employee-context">Employee context (optional)</label>
                         <textarea id="employee-context" rows="3" placeholder="e.g. I need to explain this to first-time commuters."></textarea>
 
-                        <button id="generate-learning-btn" class="btn-primary">Generate Learning Module</button>
-                        <div id="learn-status" class="learn-status"><p>Tip: richer specs produce better cards and quiz questions.</p></div>
+                            <button id="generate-learning-btn" class="btn-primary">Generate Learning Module</button>
+                            <div id="learn-status" class="learn-status"><p>Tip: richer specs produce better cards and quiz questions.</p></div>
+                        </div>
+                    </div>
+
+                    <div class="training-preview">
+                        <article class="learn-summary-card">
+                            <h3>Training progress</h3>
+                            <p>Use Setup, then review flashcards and quiz in order.</p>
+                            <ul>
+                                <li>1) Generate module from specs</li>
+                                <li>2) Study flashcards</li>
+                                <li>3) Complete quiz and review score</li>
+                            </ul>
+                        </article>
+                        <div id="training-summary" class="training-summary">
+                            <article class="learn-summary-card empty">
+                                <h3>Training Summary</h3>
+                                <p>Generate a module to get overview, talking points, objections, and fit guidance.</p>
+                            </article>
+                        </div>
                     </div>
                 </div>
 

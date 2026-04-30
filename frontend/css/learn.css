@@ -11,6 +11,11 @@ body {
 
 .learn-hero {
     margin-bottom: 1.4rem;
+    border: 1px solid rgba(127, 161, 255, 0.24);
+    border-radius: 18px;
+    background: rgba(4, 10, 22, 0.62);
+    backdrop-filter: blur(10px);
+    padding: 1.1rem 1.2rem;
 }
 
 .hero-eyebrow {
@@ -54,6 +59,7 @@ body {
 
 .learn-tab-content { display:none; }
 .learn-tab-content.active { display:block; }
+.setup-grid { display:grid; grid-template-columns: 1.1fr 0.9fr; gap: 1rem; align-items: start; }
 
 .panel, .flashcards-panel, .quiz-panel, .learn-summary-card {
     border: 1px solid rgba(127, 161, 255, 0.2);
@@ -63,6 +69,7 @@ body {
 }
 
 .training-summary { margin-top: 1rem; }
+.summary-grid { display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:0.75rem; }
 .learn-summary-card h4 { margin: 0.7rem 0 0.35rem; }
 .learn-summary-card p, .learn-summary-card li { color: #d5dff8; }
 
@@ -91,25 +98,35 @@ body {
 .learn-inline-success { color: #b6f8e0; }
 
 .flashcard-progress { text-align: center; margin-bottom: 0.7rem; color:#c8d6fb; font-weight:700; }
-.flashcard-viewer { display:flex; justify-content:center; perspective:1200px; }
-.flashcard-card { width:100%; max-width:640px; min-height:310px; position:relative; transform-style:preserve-3d; transition:transform .4s; cursor:pointer; }
-.flashcard-card.flipped { transform: rotateY(180deg); }
+.flashcard-viewer { display:flex; justify-content:center; perspective:1500px; margin: 0.3rem auto; }
+.flashcard-card { width:100%; max-width:760px; min-height:360px; position:relative; transform-style:preserve-3d; transition:transform .6s cubic-bezier(.2,.8,.2,1); cursor:pointer; }
+.flashcard-card.flipped { transform: rotateY(180deg) scale(1.01); }
 .flashcard-face { position:absolute; inset:0; border-radius:16px; border:1px solid rgba(127,161,255,.24); background: rgba(15,26,57,.84); padding:1.5rem; display:flex; align-items:center; justify-content:center; text-align:center; backface-visibility:hidden; }
 .flashcard-back { transform: rotateY(180deg); background: rgba(24, 40, 84, 0.85); }
 .flashcard-face div:first-child { font-size: 1.25rem; line-height: 1.45; }
 .flashcard-hint { position:absolute; bottom:14px; left:50%; transform:translateX(-50%); color:#a9bce9; font-size:.82rem; }
 .flashcard-controls { display:flex; gap:.5rem; justify-content:center; margin-top:.9rem; }
 .flashcard-controls button, .quiz-option, .decision-btn { border-radius:10px; border:1px solid rgba(127,161,255,.34); background:rgba(127,161,255,.12); color:#e8efff; padding:.5rem .75rem; cursor:pointer; }
+.flashcard-progress-meta { display:flex; justify-content:space-between; color:#b7c9f0; font-size:0.85rem; margin-bottom:0.35rem; }
+.flashcard-progress-bar { height:8px; border-radius:999px; background:rgba(127,161,255,.15); overflow:hidden; margin-bottom:0.8rem; }
+.flashcard-progress-bar span { display:block; height:100%; background:linear-gradient(90deg,#7fa1ff,#9cc2ff); }
+.flashcard-learning-controls { display:flex; justify-content:center; gap:.5rem; margin-top:.75rem; }
+.flashcard-learning-controls button { border-radius:999px; border:1px solid rgba(127,161,255,.35); background:rgba(127,161,255,.12); color:#dce8ff; padding:.45rem .9rem; cursor:pointer; }
+.flashcard-learning-controls button.active { background:rgba(127,161,255,.3); border-color:rgba(127,161,255,.58); }
 
 .quiz-progress { color:#aac0f1; margin-bottom:0.5rem; }
+.quiz-score-live { color:#c9dafd; margin-bottom:0.55rem; font-size:0.9rem; }
 .quiz-options { display:grid; gap:0.5rem; margin-top:0.7rem; }
+.quiz-option { text-align:left; padding:0.65rem 0.8rem; transition:all .2s ease; }
+.quiz-option:hover:not(:disabled) { background:rgba(127,161,255,.22); transform:translateY(-1px); }
 .quiz-option.correct { border-color: rgba(52,211,153,.6); background: rgba(52,211,153,.2); }
 .quiz-option.incorrect { border-color: rgba(251,113,133,.6); background: rgba(251,113,133,.18); }
 .quiz-feedback { min-height: 1.4rem; margin-top: 0.6rem; color:#d8e2fb; }
 .hidden { display:none; }
 
 @media (max-width: 760px) {
+    .setup-grid, .summary-grid { grid-template-columns: 1fr; }
     .form-row.two-col { grid-template-columns: 1fr; }
-    .flashcard-card { min-height: 260px; }
+    .flashcard-card { min-height: 280px; }
     .flashcard-face div:first-child { font-size: 1.05rem; }
 }

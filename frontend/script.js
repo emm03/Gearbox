@@ -494,32 +494,6 @@ function renderDecisionPath(data) {
             </div>
         </article>
     `;
-}
-
-function renderDecisionInlinePanel(mode) {
-    const panel = document.getElementById("decision-inline-panel");
-    if (!panel) return;
-
-    if (mode === "refine") {
-        panel.innerHTML = `
-            <p class="decision-inline-title">Refine my needs</p>
-            <div class="decision-actions">
-                <button class="decision-btn" type="button" data-refine-focus="comfort">Comfort matters most</button>
-                <button class="decision-btn" type="button" data-refine-focus="budget">Budget matters most</button>
-                <button class="decision-btn" type="button" data-refine-focus="performance">Performance matters most</button>
-            </div>
-            <p class="decision-inline-note">Pick one to tighten guidance. We will update buyer context and refresh the recommendation.</p>
-        `;
-        panel.classList.remove("hidden");
-        return;
-    }
-
-    const category = document.getElementById("single-category")?.value || "";
-    const bullets = getCategoryLearningBullets(category);
-    panel.innerHTML = `
-        <p class="decision-inline-title">What matters most for ${escapeHtml(category || "this category")}</p>
-        <ul>${bullets.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
-    `;
     panel.classList.remove("hidden");
 }
 
@@ -795,6 +769,7 @@ let currentFlashcardFlipped = false;
 let currentQuizIndex = 0;
 let currentQuizScore = 0;
 let currentQuizAnswered = false;
+let flashcardMastery = {};
 
 /*************************************************
  * LEARN MODE
@@ -857,6 +832,7 @@ async function handleGenerateLearning() {
         currentQuizIndex = 0;
         currentQuizScore = 0;
         currentQuizAnswered = false;
+        flashcardMastery = {};
 
         renderLearningModule(data);
         if (status) status.innerHTML = `<p class="learn-inline-success">Training module ready. Start with flashcards.</p>`;
@@ -902,19 +878,12 @@ function renderTrainingSummary(data) {
     const notFit = listOrEmpty(data.notBestFit || data.notIdealFor);
 
     container.innerHTML = `
-        <article class="learn-summary-card">
-            <h3>Training Summary</h3>
-            <p>${escapeHtml(overview)}</p>
-            <h4>Top customer talking points</h4>
-            ${listToHtml(talkingPoints, "No talking points generated yet.")}
-            <h4>Common objections + responses</h4>
-            ${listToHtml(objections, "No objections generated yet.")}
-            <h4>Best fit / Not best fit</h4>
-            <p><strong>Best fit:</strong></p>
-            ${listToHtml(fit, "No best-fit guidance generated yet.")}
-            <p><strong>Not best fit:</strong></p>
-            ${listToHtml(notFit, "No mismatch guidance generated yet.")}
-        </article>
+        <section class="summary-grid">
+            <article class="learn-summary-card"><h3>Product overview</h3><p>${escapeHtml(overview)}</p></article>
+            <article class="learn-summary-card"><h3>Key talking points</h3>${listToHtml(talkingPoints, "No talking points generated yet.")}</article>
+            <article class="learn-summary-card"><h3>Customer objections</h3>${listToHtml(objections, "No objections generated yet.")}</article>
+            <article class="learn-summary-card"><h3>Best fit / Not best fit</h3><p><strong>Best fit:</strong></p>${listToHtml(fit, "No best-fit guidance generated yet.")}<p><strong>Not best fit:</strong></p>${listToHtml(notFit, "No mismatch guidance generated yet.")}</article>
+        </section>
     `;
 }
 
@@ -935,8 +904,15 @@ function renderSingleFlashcardView(data) {
 
     const card = flashcards[currentFlashcardIndex];
 
+    const progressPercent = Math.round(((currentFlashcardIndex + 1) / flashcards.length) * 100);
+    const masteredCount = Object.values(flashcardMastery).filter(v => v === "mastered").length;
     flashcardsContainer.innerHTML = `
         <div class="flashcard-progress">Card ${currentFlashcardIndex + 1} of ${flashcards.length}</div>
+        <div class="flashcard-progress-meta">
+            <span>Mastered: ${masteredCount}</span>
+            <span>Progress: ${progressPercent}%</span>
+        </div>
+        <div class="flashcard-progress-bar"><span style="width:${progressPercent}%"></span></div>
 
         <div class="flashcard-viewer">
             <div class="flashcard-card ${currentFlashcardFlipped ? "flipped" : ""}" id="active-flashcard">
@@ -955,12 +931,18 @@ function renderSingleFlashcardView(data) {
             <button id="flashcard-flip-btn">Flip</button>
             <button id="flashcard-next-btn" ${currentFlashcardIndex === flashcards.length - 1 ? "disabled" : ""}>Next</button>
         </div>
+        <div class="flashcard-learning-controls">
+            <button id="mark-mastered-btn" class="${flashcardMastery[currentFlashcardIndex] === "mastered" ? "active" : ""}">Mastered</button>
+            <button id="mark-learning-btn" class="${flashcardMastery[currentFlashcardIndex] === "learning" ? "active" : ""}">Still learning</button>
+        </div>
     `;
 
     const activeFlashcard = document.getElementById("active-flashcard");
     const prevBtn = document.getElementById("flashcard-prev-btn");
     const flipBtn = document.getElementById("flashcard-flip-btn");
     const nextBtn = document.getElementById("flashcard-next-btn");
+    const masteredBtn = document.getElementById("mark-mastered-btn");
+    const learningBtn = document.getElementById("mark-learning-btn");
 
     if (activeFlashcard) {
         activeFlashcard.addEventListener("click", () => {
@@ -997,6 +979,14 @@ function renderSingleFlashcardView(data) {
             }
         });
     }
+    if (masteredBtn) masteredBtn.addEventListener("click", () => {
+        flashcardMastery[currentFlashcardIndex] = "mastered";
+        renderSingleFlashcardView(currentLearningData);
+    });
+    if (learningBtn) learningBtn.addEventListener("click", () => {
+        flashcardMastery[currentFlashcardIndex] = "learning";
+        renderSingleFlashcardView(currentLearningData);
+    });
 }
 
 function renderQuizView(data) {
@@ -1030,6 +1020,7 @@ function renderQuizView(data) {
     quizContainer.innerHTML = `
         <div class="quiz-question ${currentQuizAnswered ? "answered" : ""}">
             <p class="quiz-progress">Question ${currentQuizIndex + 1} of ${quiz.length}</p>
+            <p class="quiz-score-live">Score: ${currentQuizScore} / ${quiz.length}</p>
             <p><strong>${escapeHtml(q.question || "No question generated.")}</strong></p>
             <div class="quiz-options">
                 ${options.map((opt, idx) => `<button class="quiz-option" type="button" data-quiz-option="${idx}" ${currentQuizAnswered ? "disabled" : ""}>${escapeHtml(opt)}</button>`).join("")}
