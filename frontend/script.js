@@ -194,22 +194,52 @@ function initExplainerMode() {
     });
 
     document.addEventListener("click", (e) => {
-        const chip = e.target.closest(".chip");
         const clearBtn = e.target.closest("#clear-followup-btn");
+        const decisionActionBtn = e.target.closest("[data-decision-action]");
+        const refineFocusBtn = e.target.closest("[data-refine-focus]");
+
+        if (decisionActionBtn) {
+            const action = decisionActionBtn.dataset.decisionAction;
+            if (action === "compare-better-options") {
+                const singleProductName = document.getElementById("single-product-name")?.value.trim() || "";
+                const singleStore = document.getElementById("single-store")?.value || "";
+                const otherStore = document.getElementById("single-store-other")?.value.trim() || "";
+                const resolvedStore = singleStore === "Other" ? otherStore : singleStore;
+
+                setMode("compare");
+                setGoal("Compare two products");
+
+                const compareAName = document.getElementById("compare-a-name");
+                const compareAStore = document.getElementById("compare-a-store");
+                if (compareAName && singleProductName) compareAName.value = singleProductName;
+                if (compareAStore && resolvedStore) compareAStore.value = resolvedStore;
+
+                const comparePanel = document.querySelector('[data-panel="compare"]');
+                comparePanel?.scrollIntoView({ behavior: "smooth", block: "start" });
+                return;
+            }
+
+            if (action === "refine-needs") {
+                renderDecisionInlinePanel("refine");
+                return;
+            }
+
+            if (action === "learn-matters") {
+                renderDecisionInlinePanel("learn");
+                return;
+            }
+        }
+
+        if (refineFocusBtn) {
+            const focus = refineFocusBtn.dataset.refineFocus || "";
+            applyRefinementFocus(focus);
+            return;
+        }
 
         if (clearBtn) {
             clearFollowupAnswer();
             return;
         }
-
-        if (!chip) return;
-
-        const wrap = chip.closest(".followup-chips");
-        if (!wrap) return;
-
-        wrap.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
-        chip.classList.add("active");
-        renderFollowupTip(chip.textContent.trim(), lastResultContext);
     });
 
     explainBtn.addEventListener("click", async () => {
@@ -377,6 +407,8 @@ function renderSingleExplainerResult(data) {
                 <p>${escapeHtml(paragraphOrFallback(data.quickVerdict, "No verdict generated yet."))}</p>
             </div>
 
+            ${renderDecisionPath(data)}
+
             <div class="explainer-result-grid">
                 ${buildResultCard("Plain English summary", `<p>${escapeHtml(paragraphOrFallback(data.plainEnglishSummary, "No summary generated yet."))}</p>`) }
                 ${buildResultCard("Who it’s for", listToHtml(listOrEmpty(data.bestFor), "No audience guidance generated yet."))}
@@ -389,7 +421,6 @@ function renderSingleExplainerResult(data) {
 
             ${renderDecisionChecklist(data)}
         </div>
-        ${renderFollowupShell(data.followUpSuggestions)}
     `;
 }
 
@@ -422,33 +453,116 @@ function renderCompareExplainerResult(data, fallbackProducts = []) {
                 ${buildResultCard("Final recommendation", `<p>${escapeHtml(paragraphOrFallback(data.finalRecommendation, "No final recommendation generated yet."))}</p>`) }
             </div>
         </div>
-        ${renderFollowupShell(data.followUpSuggestions)}
     `;
 }
 
-function renderFollowupShell(dynamicSuggestions = []) {
-    const chipSet = [...dynamicSuggestions, ...DEFAULT_FOLLOW_UPS]
-        .filter(Boolean)
-        .filter((value, idx, arr) => arr.indexOf(value) === idx)
-        .slice(0, 5);
-
-    const chips = chipSet.length ? chipSet : DEFAULT_FOLLOW_UPS;
+function renderDecisionPath(data) {
+    const finalDecision = inferDecisionLabel(data.quickVerdict, data.recommendation);
+    const reasons = [
+        paragraphOrFallback(data.plainEnglishSummary, ""),
+        paragraphOrFallback(data.whatActuallyMatters, ""),
+        ...listOrEmpty(data.redFlags)
+    ].filter(Boolean).slice(0, 3);
+    const checks = [
+        ...listOrEmpty(data.missingInfo),
+        ...listOrEmpty(data.questionsToAsk)
+    ];
 
     return `
-        <div class="followup-wrap">
-            <p class="followup-title">Quick follow-up questions</p>
-            <div class="followup-chips">
-                ${chips.map(chip => `<button class="chip" type="button">${escapeHtml(chip)}</button>`).join("")}
+        <article class="result-card featured-card decision-path-card">
+            <h4>Decision Path</h4>
+            <div class="decision-path-block">
+                <p class="decision-path-label">Final decision</p>
+                <p><span class="decision-pill decision-${finalDecision.key}">${finalDecision.label}</span></p>
             </div>
-            <div class="followup-answer-panel hidden" id="followup-answer-panel">
-                <div class="followup-answer-header">
-                    <h4 id="followup-question-title">Follow-up question</h4>
-                    <button class="clear-followup-btn" id="clear-followup-btn" type="button">Clear follow-up</button>
+            <div class="decision-path-block">
+                <p class="decision-path-label">Why this decision</p>
+                ${listToHtml(reasons, "Not enough evidence yet. Add product details and buyer context for a stronger recommendation.")}
+            </div>
+            <div class="decision-path-block">
+                <p class="decision-path-label">What to check before buying</p>
+                ${listToHtml(checks, "Ask for missing specs and return policy details before buying.")}
+            </div>
+            <div class="decision-path-block">
+                <p class="decision-path-label">Next step (most important)</p>
+                <div class="decision-actions">
+                    <button class="decision-btn primary" type="button" data-decision-action="compare-better-options">Compare with better options</button>
+                    <button class="decision-btn" type="button" data-decision-action="refine-needs">Refine my needs</button>
+                    <button class="decision-btn" type="button" data-decision-action="learn-matters">Learn what matters</button>
                 </div>
-                <p class="followup-response" id="followup-response"></p>
+                <div class="decision-inline-panel hidden" id="decision-inline-panel"></div>
             </div>
-        </div>
+        </article>
     `;
+}
+
+function renderDecisionInlinePanel(mode) {
+    const panel = document.getElementById("decision-inline-panel");
+    if (!panel) return;
+
+    if (mode === "refine") {
+        panel.innerHTML = `
+            <p class="decision-inline-title">Refine my needs</p>
+            <div class="decision-actions">
+                <button class="decision-btn" type="button" data-refine-focus="comfort">Comfort matters most</button>
+                <button class="decision-btn" type="button" data-refine-focus="budget">Budget matters most</button>
+                <button class="decision-btn" type="button" data-refine-focus="performance">Performance matters most</button>
+            </div>
+            <p class="decision-inline-note">Pick one to tighten guidance. We will update buyer context and refresh the recommendation.</p>
+        `;
+        panel.classList.remove("hidden");
+        return;
+    }
+
+    const category = document.getElementById("single-category")?.value || "";
+    const bullets = getCategoryLearningBullets(category);
+    panel.innerHTML = `
+        <p class="decision-inline-title">What matters most for ${escapeHtml(category || "this category")}</p>
+        <ul>${bullets.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+    `;
+    panel.classList.remove("hidden");
+}
+
+async function applyRefinementFocus(focus) {
+    const buyerContextEl = document.getElementById("single-buyer-context");
+    if (!buyerContextEl) return;
+
+    const notes = {
+        comfort: "Priority: Comfort matters most.",
+        budget: "Priority: Budget matters most.",
+        performance: "Priority: Performance matters most."
+    };
+    const note = notes[focus];
+    if (!note) return;
+
+    if (!buyerContextEl.value.includes(note)) {
+        buyerContextEl.value = [buyerContextEl.value.trim(), note].filter(Boolean).join("\n");
+    }
+
+    const panel = document.getElementById("decision-inline-panel");
+    if (panel) {
+        panel.innerHTML += `<p class="decision-inline-note">Refreshing guidance with your new priority: ${escapeHtml(note)}</p>`;
+    }
+
+    await handleSingleExplainClick("Is this right for me?");
+}
+
+function getCategoryLearningBullets(category) {
+    if (category === "Bike") {
+        return ["Fit and frame size", "Brake type", "Tire width", "Gearing range", "Intended terrain"];
+    }
+    return ["Fit for your use case", "Comfort over long sessions", "Durability and maintenance", "Core performance specs", "Total ownership cost"];
+}
+
+function inferDecisionLabel(quickVerdict, recommendation) {
+    const joined = `${quickVerdict || ""} ${recommendation || ""}`.toLowerCase();
+    if (/(not recommended|avoid|skip|poor fit|don'?t buy|bad fit)/.test(joined)) {
+        return { key: "not-recommended", label: "Not recommended" };
+    }
+    if (/(good fit|strong fit|recommended|buy|worth it|great option)/.test(joined)) {
+        return { key: "good-fit", label: "Good fit" };
+    }
+    return { key: "maybe", label: "Maybe" };
 }
 
 function renderDecisionChecklist(data) {
