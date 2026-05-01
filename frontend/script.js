@@ -494,6 +494,49 @@ function renderDecisionPath(data) {
             </div>
         </article>
     `;
+    panel.classList.remove("hidden");
+}
+
+async function applyRefinementFocus(focus) {
+    const buyerContextEl = document.getElementById("single-buyer-context");
+    if (!buyerContextEl) return;
+
+    const notes = {
+        comfort: "Priority: Comfort matters most.",
+        budget: "Priority: Budget matters most.",
+        performance: "Priority: Performance matters most."
+    };
+    const note = notes[focus];
+    if (!note) return;
+
+    if (!buyerContextEl.value.includes(note)) {
+        buyerContextEl.value = [buyerContextEl.value.trim(), note].filter(Boolean).join("\n");
+    }
+
+    const panel = document.getElementById("decision-inline-panel");
+    if (panel) {
+        panel.innerHTML += `<p class="decision-inline-note">Refreshing guidance with your new priority: ${escapeHtml(note)}</p>`;
+    }
+
+    await handleSingleExplainClick("Is this right for me?");
+}
+
+function getCategoryLearningBullets(category) {
+    if (category === "Bike") {
+        return ["Fit and frame size", "Brake type", "Tire width", "Gearing range", "Intended terrain"];
+    }
+    return ["Fit for your use case", "Comfort over long sessions", "Durability and maintenance", "Core performance specs", "Total ownership cost"];
+}
+
+function inferDecisionLabel(quickVerdict, recommendation) {
+    const joined = `${quickVerdict || ""} ${recommendation || ""}`.toLowerCase();
+    if (/(not recommended|avoid|skip|poor fit|don'?t buy|bad fit)/.test(joined)) {
+        return { key: "not-recommended", label: "Not recommended" };
+    }
+    if (/(good fit|strong fit|recommended|buy|worth it|great option)/.test(joined)) {
+        return { key: "good-fit", label: "Good fit" };
+    }
+    return { key: "maybe", label: "Maybe" };
 }
 
 function renderDecisionInlinePanel(mode) {
@@ -876,12 +919,14 @@ function renderTrainingSummary(data) {
     const notFit = listOrEmpty(data.notBestFit || data.notIdealFor);
 
     container.innerHTML = `
-        <section class="summary-grid">
-            <article class="learn-summary-card"><h3>Product overview</h3><p>${escapeHtml(overview)}</p></article>
-            <article class="learn-summary-card"><h3>Key talking points</h3>${listToHtml(talkingPoints, "No talking points generated yet.")}</article>
-            <article class="learn-summary-card"><h3>Customer objections</h3>${listToHtml(objections, "No objections generated yet.")}</article>
-            <article class="learn-summary-card"><h3>Best fit / Not best fit</h3><p><strong>Best fit:</strong></p>${listToHtml(fit, "No best-fit guidance generated yet.")}<p><strong>Not best fit:</strong></p>${listToHtml(notFit, "No mismatch guidance generated yet.")}</article>
-        </section>
+        <article class="learn-summary-card">
+            <h3>Training Summary</h3>
+            <p>${escapeHtml(overview)}</p>
+            <p><strong>Top talking points</strong></p>
+            ${listToHtml(talkingPoints.slice(0, 3), "No talking points generated yet.")}
+            <p><strong>Likely objections</strong></p>
+            ${listToHtml(objections.slice(0, 3), "No objections generated yet.")}
+        </article>
     `;
 }
 
@@ -1061,7 +1106,11 @@ function renderPracticeView(data) {
     document.getElementById("practice-dont-know-btn")?.addEventListener("click", () => {
         if (currentPracticeAnswered) return;
         currentPracticeAnswered = true;
-        if (feedback) feedback.textContent = "No problem. Review the flashcard and try the next one.";
+        const correct = Number(q.correctIndex);
+        const correctBtn = container.querySelector(`[data-practice-option="${correct}"]`);
+        correctBtn?.classList.add("correct");
+        container.querySelectorAll("[data-practice-option]").forEach(el => el.disabled = true);
+        if (feedback) feedback.textContent = `No problem. Correct answer: ${options[correct] || "N/A"}. ${q.explanation || ""}`.trim();
         document.getElementById("practice-next-btn")?.classList.remove("hidden");
     });
     document.getElementById("practice-next-btn")?.addEventListener("click", () => {
@@ -1113,7 +1162,10 @@ function renderQuizView(data) {
                 ${options.map((opt, idx) => `<button class="quiz-option" type="button" data-quiz-option="${idx}" ${currentQuizAnswered ? "disabled" : ""}>${escapeHtml(opt)}</button>`).join("")}
             </div>
             <p class="quiz-feedback" id="quiz-feedback"></p>
-            <button id="quiz-next-btn" class="decision-btn primary ${currentQuizAnswered ? "" : "hidden"}" type="button">Next question</button>
+            <div class="flashcard-controls">
+                <button id="quiz-dont-know-btn" class="decision-btn ${currentQuizAnswered ? "hidden" : ""}" type="button">Don't know?</button>
+                <button id="quiz-next-btn" class="decision-btn primary ${currentQuizAnswered ? "" : "hidden"}" type="button">Next question</button>
+            </div>
         </div>
     `;
 
@@ -1135,6 +1187,17 @@ function renderQuizView(data) {
                 : `Not quite. Correct answer: ${options[correct] || "N/A"}.`;
             document.getElementById("quiz-next-btn")?.classList.remove("hidden");
         });
+    });
+    document.getElementById("quiz-dont-know-btn")?.addEventListener("click", () => {
+        if (currentQuizAnswered) return;
+        currentQuizAnswered = true;
+        const correct = Number(q.correctIndex);
+        const correctBtn = quizContainer.querySelector(`[data-quiz-option="${correct}"]`);
+        correctBtn?.classList.add("correct");
+        quizContainer.querySelectorAll("[data-quiz-option]").forEach(optionBtn => optionBtn.disabled = true);
+        if (feedback) feedback.textContent = `Correct answer: ${options[correct] || "N/A"}. ${q.explanation || ""}`.trim();
+        document.getElementById("quiz-next-btn")?.classList.remove("hidden");
+        document.getElementById("quiz-dont-know-btn")?.classList.add("hidden");
     });
 
     document.getElementById("quiz-next-btn")?.addEventListener("click", () => {

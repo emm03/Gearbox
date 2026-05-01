@@ -7,6 +7,45 @@ const router = express.Router();
 const { fetch } = require("undici");
 
 const openai = require("../services/openai");
+const TARGET_COUNT = 10;
+
+function shuffledOptions(options = [], correctIndex = 0) {
+    const normalized = options.map((text, idx) => ({ text, correct: idx === Number(correctIndex) }));
+    for (let i = normalized.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [normalized[i], normalized[j]] = [normalized[j], normalized[i]];
+    }
+    return {
+        options: normalized.map(item => item.text),
+        correctIndex: Math.max(0, normalized.findIndex(item => item.correct))
+    };
+}
+
+function normalizeQuestion(q = {}) {
+    const options = Array.isArray(q.options) ? q.options.filter(Boolean).slice(0, 4) : [];
+    while (options.length < 4) options.push("Not enough context to determine");
+    const shuffled = shuffledOptions(options, q.correctIndex ?? 0);
+    return {
+        question: q.question || "Which statement best matches the product information?",
+        options: shuffled.options,
+        correctIndex: shuffled.correctIndex,
+        explanation: q.explanation || "Based on the provided product details."
+    };
+}
+
+function buildFallbackQuestions(flashcards = [], count = TARGET_COUNT) {
+    return flashcards.slice(0, count).map((card, idx) => normalizeQuestion({
+        question: card.front || `Product fact check ${idx + 1}`,
+        options: [
+            card.back || "No specific answer available",
+            "Not enough context to confirm",
+            "Needs more specs to verify",
+            "Cannot be determined from provided details"
+        ],
+        correctIndex: 0,
+        explanation: "Derived directly from the generated flashcard answer."
+    }));
+}
 
 /**
  * POST /api/learn
@@ -119,6 +158,31 @@ RULES:
                 error: "Failed to parse learning module."
             });
         }
+
+        parsed.flashcards = Array.isArray(parsed.flashcards) ? parsed.flashcards.filter(Boolean).slice(0, TARGET_COUNT) : [];
+        parsed.practice = Array.isArray(parsed.practice) ? parsed.practice.filter(Boolean) : [];
+        parsed.quiz = Array.isArray(parsed.quiz) ? parsed.quiz.filter(Boolean) : [];
+
+        if (parsed.flashcards.length < TARGET_COUNT && parsed.flashcards.length > 0) {
+            while (parsed.flashcards.length < TARGET_COUNT) {
+                const source = parsed.flashcards[parsed.flashcards.length % Math.max(parsed.flashcards.length, 1)] || {};
+                parsed.flashcards.push({
+                    front: source.front || "Product fact review",
+                    back: source.back || "Review product details for this item."
+                });
+                if (parsed.flashcards.length > TARGET_COUNT) break;
+            }
+        }
+
+        if (parsed.practice.length < TARGET_COUNT) {
+            parsed.practice = [...parsed.practice, ...buildFallbackQuestions(parsed.flashcards, TARGET_COUNT)].slice(0, TARGET_COUNT);
+        }
+        if (parsed.quiz.length < TARGET_COUNT) {
+            parsed.quiz = [...parsed.quiz, ...buildFallbackQuestions(parsed.flashcards, TARGET_COUNT)].slice(0, TARGET_COUNT);
+        }
+
+        parsed.practice = parsed.practice.slice(0, TARGET_COUNT).map(normalizeQuestion);
+        parsed.quiz = parsed.quiz.slice(0, TARGET_COUNT).map(normalizeQuestion);
 
         res.json(parsed);
 
