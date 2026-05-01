@@ -7,7 +7,11 @@ const router = express.Router();
 const { fetch } = require("undici");
 
 const openai = require("../services/openai");
-const TARGET_COUNT = 10;
+const PLAN_TARGETS = {
+    free: { flashcards: 10, practice: 10, quiz: 10 },
+    pro: { flashcards: 30, practice: 30, quiz: 30 },
+    team: { flashcards: 100, practice: 100, quiz: 100 }
+};
 
 function shuffledOptions(options = [], correctIndex = 0) {
     const normalized = options.map((text, idx) => ({ text, correct: idx === Number(correctIndex) }));
@@ -33,14 +37,14 @@ function normalizeQuestion(q = {}) {
     };
 }
 
-function buildFallbackQuestions(flashcards = [], count = TARGET_COUNT) {
+function buildFallbackQuestions(flashcards = [], count = 10) {
     return flashcards.slice(0, count).map((card, idx) => normalizeQuestion({
-        question: card.front || `Product fact check ${idx + 1}`,
+        question: card.front || `Which statement best describes this product? (${idx + 1})`,
         options: [
             card.back || "No specific answer available",
-            "Not enough context to confirm",
-            "Needs more specs to verify",
-            "Cannot be determined from provided details"
+            "What does this feature help with?",
+            "Who is this product best suited for?",
+            "Needs more specs to verify"
         ],
         correctIndex: 0,
         explanation: "Derived directly from the generated flashcard answer."
@@ -53,6 +57,8 @@ function buildFallbackQuestions(flashcards = [], count = TARGET_COUNT) {
 router.post("/", async (req, res) => {
     try {
         const { store = "", department = "", specs = "", productName = "", employeeContext = "", productUrl = "" } = req.body;
+        const selectedPlan = String(req.body?.plan || "free").toLowerCase();
+        const targets = PLAN_TARGETS[selectedPlan] || PLAN_TARGETS.free;
 
         if (!specs?.trim() && !productUrl?.trim() && !productName?.trim()) {
             return res.status(400).json({
@@ -131,9 +137,12 @@ RULES:
 - No markdown
 - No extra text
 - JSON only
-- If product context is sufficient, you MUST generate exactly 10 flashcards, exactly 10 practice questions, and exactly 10 quiz questions.
-- Do not stop at 3-4 items when the URL/specs include enough features to produce a full set.
-- If context is limited, return fewer but accurate items. Do not hallucinate specific facts.
+- Target counts for this request:
+  - flashcards: ${targets.flashcards}
+  - practice: ${targets.practice}
+  - quiz: ${targets.quiz}
+- If product context is rich, generate as close to target counts as possible.
+- If context is limited, return fewer high-confidence items. Do not hallucinate specific facts.
 `;
 
         const response = await openai.responses.create({
@@ -159,30 +168,30 @@ RULES:
             });
         }
 
-        parsed.flashcards = Array.isArray(parsed.flashcards) ? parsed.flashcards.filter(Boolean).slice(0, TARGET_COUNT) : [];
+        parsed.flashcards = Array.isArray(parsed.flashcards) ? parsed.flashcards.filter(Boolean).slice(0, targets.flashcards) : [];
         parsed.practice = Array.isArray(parsed.practice) ? parsed.practice.filter(Boolean) : [];
         parsed.quiz = Array.isArray(parsed.quiz) ? parsed.quiz.filter(Boolean) : [];
 
-        if (parsed.flashcards.length < TARGET_COUNT && parsed.flashcards.length > 0) {
-            while (parsed.flashcards.length < TARGET_COUNT) {
+        if (parsed.flashcards.length < targets.flashcards && parsed.flashcards.length > 0) {
+            while (parsed.flashcards.length < targets.flashcards) {
                 const source = parsed.flashcards[parsed.flashcards.length % Math.max(parsed.flashcards.length, 1)] || {};
                 parsed.flashcards.push({
                     front: source.front || "Product fact review",
                     back: source.back || "Review product details for this item."
                 });
-                if (parsed.flashcards.length > TARGET_COUNT) break;
+                if (parsed.flashcards.length > targets.flashcards) break;
             }
         }
 
-        if (parsed.practice.length < TARGET_COUNT) {
-            parsed.practice = [...parsed.practice, ...buildFallbackQuestions(parsed.flashcards, TARGET_COUNT)].slice(0, TARGET_COUNT);
+        if (parsed.practice.length < targets.practice) {
+            parsed.practice = [...parsed.practice, ...buildFallbackQuestions(parsed.flashcards, targets.practice)].slice(0, targets.practice);
         }
-        if (parsed.quiz.length < TARGET_COUNT) {
-            parsed.quiz = [...parsed.quiz, ...buildFallbackQuestions(parsed.flashcards, TARGET_COUNT)].slice(0, TARGET_COUNT);
+        if (parsed.quiz.length < targets.quiz) {
+            parsed.quiz = [...parsed.quiz, ...buildFallbackQuestions(parsed.flashcards, targets.quiz)].slice(0, targets.quiz);
         }
 
-        parsed.practice = parsed.practice.slice(0, TARGET_COUNT).map(normalizeQuestion);
-        parsed.quiz = parsed.quiz.slice(0, TARGET_COUNT).map(normalizeQuestion);
+        parsed.practice = parsed.practice.slice(0, targets.practice).map(normalizeQuestion);
+        parsed.quiz = parsed.quiz.slice(0, targets.quiz).map(normalizeQuestion);
 
         res.json(parsed);
 

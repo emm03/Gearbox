@@ -825,7 +825,7 @@ async function handleGenerateLearning() {
         const res = await fetch("https://gearbox-nhws.onrender.com/api/learn", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ store, department, specs, productName, employeeContext, productUrl })
+            body: JSON.stringify({ store, department, specs, productName, employeeContext, productUrl, plan: "free" })
         });
 
         const data = await res.json();
@@ -884,14 +884,14 @@ function renderTrainingDashboard(data) {
     const dashboard = document.getElementById("training-dashboard");
     if (!dashboard) return;
     const flashcards = Array.isArray(data.flashcards) ? data.flashcards : [];
+    const practice = Array.isArray(data.practice) ? data.practice : [];
     const quiz = Array.isArray(data.quiz) ? data.quiz : [];
     const masteredCount = Object.values(flashcardMastery).filter(v => v === "mastered").length;
-    const completion = flashcards.length ? Math.round((masteredCount / flashcards.length) * 100) : 0;
     dashboard.innerHTML = `
         <article class="dashboard-stat"><p>Cards generated</p><h3>${flashcards.length}</h3></article>
+        <article class="dashboard-stat"><p>Practice questions</p><h3>${practice.length}</h3></article>
         <article class="dashboard-stat"><p>Quiz questions</p><h3>${quiz.length}</h3></article>
         <article class="dashboard-stat"><p>Mastered count</p><h3>${masteredCount}</h3></article>
-        <article class="dashboard-stat"><p>Completion</p><h3>${completion}%</h3></article>
     `;
 }
 
