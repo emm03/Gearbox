@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -9,7 +8,6 @@
     <link rel="stylesheet" href="css/header.css" />
     <link rel="stylesheet" href="css/learn.css" />
 </head>
-
 <body>
     <header>
         <div class="header-inner">
@@ -47,60 +45,46 @@
                         <h2>Module setup</h2>
                         <p class="muted">Enter product details to generate training content.</p>
                         <div class="learn-form">
-                            <div class="form-row two-col">
-                                <div>
-                                    <label for="store-select">Store</label>
-                                    <select id="store-select">
-                                        <option value="rei">REI</option>
-                                        <option value="generic">Generic Store</option>
-                                    </select>
-                                </div>
-                                <div>
-                                    <label for="department-select">Department</label>
-                                    <select id="department-select">
-                                        <option value="bikes">Bikes</option>
-                                        <option value="footwear">Footwear</option>
-                                        <option value="camping">Camping</option>
-                                    </select>
-                                </div>
+                        <div class="form-row two-col">
+                            <div>
+                                <label for="store-select">Store</label>
+                                <select id="store-select">
+                                    <option value="rei">REI</option>
+                                    <option value="generic">Generic Store</option>
+                                </select>
                             </div>
+                            <div>
+                                <label for="department-select">Department</label>
+                                <select id="department-select">
+                                    <option value="bikes">Bikes</option>
+                                    <option value="footwear">Footwear</option>
+                                    <option value="camping">Camping</option>
+                                </select>
+                            </div>
+                        </div>
 
-                            <label for="learn-product-name">Product name</label>
-                            <input id="learn-product-name" type="text" placeholder="e.g. Trek FX 2 Disc" />
+                        <label for="learn-product-name">Product name</label>
+                        <input id="learn-product-name" type="text" placeholder="e.g. Trek FX 2 Disc" />
+                        <label for="learn-product-url">Product URL (optional)</label>
+                        <input id="learn-product-url" type="url" placeholder="https://..." />
 
-                            <label for="product-specs">Specs / product details</label>
-                            <textarea id="product-specs" rows="8"
-                                placeholder="Paste technical specs, feature bullets, materials, fit notes, and pricing details..."></textarea>
+                        <label for="product-specs">Specs / product details</label>
+                        <textarea id="product-specs" rows="8" placeholder="Paste technical specs, feature bullets, materials, fit notes, and pricing details..."></textarea>
 
-                            <label for="employee-context">Employee context (optional)</label>
-                            <textarea id="employee-context" rows="3"
-                                placeholder="e.g. I need to explain this to first-time commuters."></textarea>
+                        <label for="employee-context">Employee context (optional)</label>
+                        <textarea id="employee-context" rows="3" placeholder="e.g. I need to explain this to first-time commuters."></textarea>
 
                             <button id="generate-learning-btn" class="btn-primary">Generate Learning Module</button>
-                            <div id="learn-status" class="learn-status">
-                                <p>Tip: richer specs produce better cards and quiz questions.</p>
-                            </div>
+                            <div id="learn-status" class="learn-status"><p>Tip: richer specs produce better cards and quiz questions.</p></div>
                         </div>
                     </div>
 
                     <div class="training-preview">
                         <div id="training-dashboard" class="training-dashboard">
-                            <article class="dashboard-stat">
-                                <p>Cards generated</p>
-                                <h3>0</h3>
-                            </article>
-                            <article class="dashboard-stat">
-                                <p>Quiz questions</p>
-                                <h3>0</h3>
-                            </article>
-                            <article class="dashboard-stat">
-                                <p>Mastered count</p>
-                                <h3>0</h3>
-                            </article>
-                            <article class="dashboard-stat">
-                                <p>Completion</p>
-                                <h3>0%</h3>
-                            </article>
+                            <article class="dashboard-stat"><p>Cards generated</p><h3>0</h3></article>
+                            <article class="dashboard-stat"><p>Quiz questions</p><h3>0</h3></article>
+                            <article class="dashboard-stat"><p>Mastered count</p><h3>0</h3></article>
+                            <article class="dashboard-stat"><p>Completion</p><h3>0%</h3></article>
                         </div>
                         <article class="learn-summary-card">
                             <h3>Training progress</h3>
@@ -142,9 +126,7 @@
                 <div class="flashcards-panel">
                     <h2>Flashcards</h2>
                     <p class="muted">Click the card to flip. Use previous/next to move through the deck.</p>
-                    <div id="flashcards-container">
-                        <p class="empty-state">No deck yet. Generate a module in Setup.</p>
-                    </div>
+                    <div id="flashcards-container"><p class="empty-state">No deck yet. Generate a module in Setup.</p></div>
                 </div>
             </div>
 
@@ -152,18 +134,14 @@
                 <div class="quiz-panel">
                     <h2>Quiz</h2>
                     <p class="muted">Answer one question at a time and get instant feedback.</p>
-                    <div id="quiz-container">
-                        <p class="empty-state">No quiz yet. Generate a module in Setup.</p>
-                    </div>
+                    <div id="quiz-container"><p class="empty-state">No quiz yet. Generate a module in Setup.</p></div>
                 </div>
             </div>
             <div class="learn-tab-content" id="practice-tab">
                 <div class="quiz-panel">
                     <h2>Practice</h2>
                     <p class="muted">Learn mode: one question at a time with instant feedback.</p>
-                    <div id="practice-container">
-                        <p class="empty-state">No practice set yet. Generate a module in Setup.</p>
-                    </div>
+                    <div id="practice-container"><p class="empty-state">No practice set yet. Generate a module in Setup.</p></div>
                 </div>
             </div>
         </section>
@@ -171,5 +149,4 @@
 
     <script src="script.js"></script>
 </body>
-
 </html>

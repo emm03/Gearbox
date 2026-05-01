@@ -1,5 +1,5 @@
 body {
-    background: radial-gradient(circle at top, #1b336d 0%, #0b1635 45%, #070d1f 100%);
+    background: radial-gradient(circle at top, #1a2742 0%, #0b1428 45%, #070d1f 100%);
     color: #e6ecff;
 }
 *, *::before, *::after { box-sizing: border-box; }
@@ -44,7 +44,7 @@ body {
     max-width: none;
     border: 1px solid rgba(127, 161, 255, 0.24);
     border-radius: 18px;
-    background: rgba(4, 10, 22, 0.56);
+    background: rgba(6, 12, 24, 0.62);
     backdrop-filter: blur(10px);
     padding: 1.2rem;
 }
@@ -66,8 +66,6 @@ body {
 .setup-grid { display:grid; grid-template-columns: minmax(0, 1.2fr) minmax(320px, 0.8fr); gap: 24px; align-items: start; }
 .setup-grid > *, .training-preview, .setup-panel, .learn-form, .form-row > div { min-width: 0; max-width: 100%; }
 .training-preview { min-width: 0; }
-.study-modes { display:flex; flex-wrap:wrap; gap:0.5rem; margin:-0.2rem 0 0.9rem; }
-.study-mode-chip { border:1px solid rgba(127,161,255,.34); background:rgba(127,161,255,.14); color:#dfe8ff; border-radius:999px; padding:.36rem .72rem; font-size:.82rem; cursor:pointer; }
 .training-dashboard { display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap:0.45rem; margin-bottom:0.55rem; }
 .dashboard-stat { border:1px solid rgba(127,161,255,.2); border-radius:10px; background:rgba(12,23,50,.5); padding:0.5rem; }
 .dashboard-stat p { color:#a8bce9; font-size:0.78rem; margin-bottom:0.25rem; text-transform:uppercase; letter-spacing:0.06em; }
