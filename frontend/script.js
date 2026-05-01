@@ -1,6 +1,9 @@
 /*************************************************
  * GLOBAL INIT
  *************************************************/
+const API_BASE_URL = (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost")
+    ? "http://localhost:4000"
+    : "https://gearbox-nhws.onrender.com";
 
 document.addEventListener("DOMContentLoaded", () => {
     initExampleRotation();
@@ -347,7 +350,7 @@ async function handleCompareExplainClick(goal) {
 }
 
 async function requestExplainer(payload) {
-    const response = await fetch("https://gearbox-nhws.onrender.com/api/explain", {
+    const response = await fetch(`${API_BASE_URL}/api/explain`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -494,6 +497,49 @@ function renderDecisionPath(data) {
             </div>
         </article>
     `;
+    panel.classList.remove("hidden");
+}
+
+async function applyRefinementFocus(focus) {
+    const buyerContextEl = document.getElementById("single-buyer-context");
+    if (!buyerContextEl) return;
+
+    const notes = {
+        comfort: "Priority: Comfort matters most.",
+        budget: "Priority: Budget matters most.",
+        performance: "Priority: Performance matters most."
+    };
+    const note = notes[focus];
+    if (!note) return;
+
+    if (!buyerContextEl.value.includes(note)) {
+        buyerContextEl.value = [buyerContextEl.value.trim(), note].filter(Boolean).join("\n");
+    }
+
+    const panel = document.getElementById("decision-inline-panel");
+    if (panel) {
+        panel.innerHTML += `<p class="decision-inline-note">Refreshing guidance with your new priority: ${escapeHtml(note)}</p>`;
+    }
+
+    await handleSingleExplainClick("Is this right for me?");
+}
+
+function getCategoryLearningBullets(category) {
+    if (category === "Bike") {
+        return ["Fit and frame size", "Brake type", "Tire width", "Gearing range", "Intended terrain"];
+    }
+    return ["Fit for your use case", "Comfort over long sessions", "Durability and maintenance", "Core performance specs", "Total ownership cost"];
+}
+
+function inferDecisionLabel(quickVerdict, recommendation) {
+    const joined = `${quickVerdict || ""} ${recommendation || ""}`.toLowerCase();
+    if (/(not recommended|avoid|skip|poor fit|don'?t buy|bad fit)/.test(joined)) {
+        return { key: "not-recommended", label: "Not recommended" };
+    }
+    if (/(good fit|strong fit|recommended|buy|worth it|great option)/.test(joined)) {
+        return { key: "good-fit", label: "Good fit" };
+    }
+    return { key: "maybe", label: "Maybe" };
 }
 
 function renderDecisionInlinePanel(mode) {
@@ -780,13 +826,14 @@ async function handleGenerateLearning() {
     }
 
     try {
-        const res = await fetch("https://gearbox-nhws.onrender.com/api/learn", {
+        const res = await fetch(`${API_BASE_URL}/api/learn`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ store, department, specs, productName, employeeContext, productUrl, plan: moduleSize })
         });
 
         const data = await res.json();
+        console.log("Learn response counts:", data.debugCounts, data.flashcards?.length, data.practice?.length, data.quiz?.length);
 
         if (!res.ok) {
             throw new Error(data.error || "Failed to generate learning module");
@@ -802,7 +849,7 @@ async function handleGenerateLearning() {
         currentPracticeIndex = 0;
         currentPracticeAnswered = false;
 
-        renderLearningModule(data);
+        renderLearningModule(normalizeLearningDataCounts(data));
         if (status) status.innerHTML = `<p class="learn-inline-success">Training module ready. Start with flashcards.</p>`;
         activateLearnTab("flashcards-tab");
 
@@ -823,6 +870,32 @@ async function handleGenerateLearning() {
             btn.textContent = "Generate Learning Module";
         }
     }
+}
+
+function normalizeLearningDataCounts(data) {
+    const result = dataToPlainObject(data);
+    const flashcards = Array.isArray(result.flashcards) ? result.flashcards : [];
+    const target = Number(result.debugCounts?.target?.practice || 0);
+    const fillQuestions = (arr, label) => {
+        const out = Array.isArray(arr) ? [...arr] : [];
+        if (!target || out.length >= target) return out;
+        let idx = 0;
+        while (out.length < target) {
+            const fc = flashcards[idx % Math.max(flashcards.length, 1)] || {};
+            const answer = fc.back || "Not specified";
+            out.push({
+                question: `${label}: ${fc.front || "What does this product help with?"}`,
+                options: [answer, "Not specified", "A different feature", "Needs more context"],
+                correctIndex: 0,
+                explanation: "Fallback generated from flashcard data."
+            });
+            idx += 1;
+        }
+        return out;
+    };
+    result.practice = fillQuestions(result.practice, "Practice check");
+    result.quiz = fillQuestions(result.quiz, "Quiz check");
+    return result;
 }
 
 /*************************************************

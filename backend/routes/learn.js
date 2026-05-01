@@ -265,6 +265,13 @@ RULES:
         parsed.flashcards = finalFlashcards;
         parsed.practice = finalPractice;
         parsed.quiz = finalQuiz;
+        parsed.debugCounts = {
+            plan: selectedPlan,
+            target: targets,
+            flashcards: finalFlashcards.length,
+            practice: finalPractice.length,
+            quiz: finalQuiz.length
+        };
 
         res.json(parsed);
 
