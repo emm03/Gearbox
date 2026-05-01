@@ -4,6 +4,7 @@
 const API_BASE_URL = (window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost")
     ? "http://localhost:4000"
     : "https://gearbox-nhws.onrender.com";
+window.gearboxContext = window.gearboxContext || {};
 
 document.addEventListener("DOMContentLoaded", () => {
     initExampleRotation();
@@ -425,6 +426,7 @@ function renderSingleExplainerResult(data) {
             ${renderDecisionChecklist(data)}
         </div>
     `;
+    window.gearboxContext.latestExplainer = data;
 }
 
 function renderCompareExplainerResult(data, fallbackProducts = []) {
@@ -457,6 +459,7 @@ function renderCompareExplainerResult(data, fallbackProducts = []) {
             </div>
         </div>
     `;
+    window.gearboxContext.latestExplainer = data;
 }
 
 function renderDecisionPath(data) {
@@ -496,6 +499,75 @@ function renderDecisionPath(data) {
                 <div class="decision-inline-panel hidden" id="decision-inline-panel"></div>
             </div>
         </article>
+    `;
+    panel.classList.remove("hidden");
+}
+
+async function applyRefinementFocus(focus) {
+    const buyerContextEl = document.getElementById("single-buyer-context");
+    if (!buyerContextEl) return;
+
+    const notes = {
+        comfort: "Priority: Comfort matters most.",
+        budget: "Priority: Budget matters most.",
+        performance: "Priority: Performance matters most."
+    };
+    const note = notes[focus];
+    if (!note) return;
+
+    if (!buyerContextEl.value.includes(note)) {
+        buyerContextEl.value = [buyerContextEl.value.trim(), note].filter(Boolean).join("\n");
+    }
+
+    const panel = document.getElementById("decision-inline-panel");
+    if (panel) {
+        panel.innerHTML += `<p class="decision-inline-note">Refreshing guidance with your new priority: ${escapeHtml(note)}</p>`;
+    }
+
+    await handleSingleExplainClick("Is this right for me?");
+}
+
+function getCategoryLearningBullets(category) {
+    if (category === "Bike") {
+        return ["Fit and frame size", "Brake type", "Tire width", "Gearing range", "Intended terrain"];
+    }
+    return ["Fit for your use case", "Comfort over long sessions", "Durability and maintenance", "Core performance specs", "Total ownership cost"];
+}
+
+function inferDecisionLabel(quickVerdict, recommendation) {
+    const joined = `${quickVerdict || ""} ${recommendation || ""}`.toLowerCase();
+    if (/(not recommended|avoid|skip|poor fit|don'?t buy|bad fit)/.test(joined)) {
+        return { key: "not-recommended", label: "Not recommended" };
+    }
+    if (/(good fit|strong fit|recommended|buy|worth it|great option)/.test(joined)) {
+        return { key: "good-fit", label: "Good fit" };
+    }
+    return { key: "maybe", label: "Maybe" };
+}
+
+function renderDecisionInlinePanel(mode) {
+    const panel = document.getElementById("decision-inline-panel");
+    if (!panel) return;
+
+    if (mode === "refine") {
+        panel.innerHTML = `
+            <p class="decision-inline-title">Refine my needs</p>
+            <div class="decision-actions">
+                <button class="decision-btn" type="button" data-refine-focus="comfort">Comfort matters most</button>
+                <button class="decision-btn" type="button" data-refine-focus="budget">Budget matters most</button>
+                <button class="decision-btn" type="button" data-refine-focus="performance">Performance matters most</button>
+            </div>
+            <p class="decision-inline-note">Pick one to tighten guidance. We will update buyer context and refresh the recommendation.</p>
+        `;
+        panel.classList.remove("hidden");
+        return;
+    }
+
+    const category = document.getElementById("single-category")?.value || "";
+    const bullets = getCategoryLearningBullets(category);
+    panel.innerHTML = `
+        <p class="decision-inline-title">What matters most for ${escapeHtml(category || "this category")}</p>
+        <ul>${bullets.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
     `;
     panel.classList.remove("hidden");
 }
@@ -849,7 +921,17 @@ async function handleGenerateLearning() {
         currentPracticeIndex = 0;
         currentPracticeAnswered = false;
 
-        renderLearningModule(normalizeLearningDataCounts(data));
+        const normalized = normalizeLearningDataCounts(data);
+        renderLearningModule(normalized);
+        window.gearboxContext.latestLearn = {
+            productName,
+            productUrl,
+            specs,
+            store,
+            department,
+            employeeContext,
+            module: normalized
+        };
         if (status) status.innerHTML = `<p class="learn-inline-success">Training module ready. Start with flashcards.</p>`;
         activateLearnTab("flashcards-tab");
 
