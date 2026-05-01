@@ -923,6 +923,16 @@ function renderSingleFlashcardView(data) {
             </div>
             <span class="muted">Study streak: ${Math.max(1, masteredCount)} cards</span>
         </div>
+        <div class="flashcard-progress-bar"><span style="width:${progressPercent}%"></span></div>
+        <div class="card-status-row">
+            <div class="status-chips">
+                <span class="status-chip ${cardStatus === "new" ? "active" : ""}">New</span>
+                <span class="status-chip ${cardStatus === "learning" ? "active" : ""}">Learning</span>
+                <span class="status-chip ${cardStatus === "mastered" ? "active" : ""}">Mastered</span>
+            </div>
+            <span class="muted">Study streak: ${Math.max(1, masteredCount)} cards</span>
+        </div>
+        <div class="flashcard-progress-bar"><span style="width:${progressPercent}%"></span></div>
 
         <div class="flashcard-viewer">
             <div class="flashcard-card ${currentFlashcardFlipped ? "flipped" : ""}" id="active-flashcard">
@@ -940,6 +950,10 @@ function renderSingleFlashcardView(data) {
             <button class="flashcard-arrow-btn" id="flashcard-prev-btn" ${currentFlashcardIndex === 0 ? "disabled" : ""} aria-label="Previous card">←</button>
             <button class="flashcard-flip-btn" id="flashcard-flip-btn" aria-label="Flip card">↻ Flip</button>
             <button class="flashcard-arrow-btn" id="flashcard-next-btn" ${currentFlashcardIndex === flashcards.length - 1 ? "disabled" : ""} aria-label="Next card">→</button>
+        </div>
+        <div class="flashcard-learning-controls">
+            <button id="mark-mastered-btn" class="${flashcardMastery[currentFlashcardIndex] === "mastered" ? "active" : ""}">Mastered</button>
+            <button id="mark-learning-btn" class="${flashcardMastery[currentFlashcardIndex] === "learning" ? "active" : ""}">Still learning</button>
         </div>
         <div class="flashcard-learning-controls">
             <button id="mark-mastered-btn" class="${flashcardMastery[currentFlashcardIndex] === "mastered" ? "active" : ""}">Mastered</button>
