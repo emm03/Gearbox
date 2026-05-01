@@ -23,8 +23,15 @@ router.post("/", async (req, res) => {
 
         let urlContext = "";
         if (productUrl?.trim()) {
+            let timeout;
             try {
-                const response = await fetch(productUrl.trim(), { method: "GET" });
+                const controller = new AbortController();
+                timeout = setTimeout(() => controller.abort(), 7000);
+                const response = await fetch(productUrl.trim(), {
+                    method: "GET",
+                    signal: controller.signal
+                });
+                clearTimeout(timeout);
                 const html = await response.text();
                 const condensed = html.replace(/<script[\s\S]*?<\/script>/gi, " ")
                     .replace(/<style[\s\S]*?<\/style>/gi, " ")
@@ -33,7 +40,9 @@ router.post("/", async (req, res) => {
                     .slice(0, 4000);
                 urlContext = condensed ? `URL CONTENT SNIPPET: ${condensed}` : "";
             } catch (_) {
-                urlContext = "URL provided but content could not be fetched. Use product name/specs context.";
+                urlContext = "URL provided but content could not be fetched quickly. Use product name/specs context.";
+            } finally {
+                if (timeout) clearTimeout(timeout);
             }
         }
 
@@ -83,7 +92,7 @@ RULES:
 - No markdown
 - No extra text
 - JSON only
-- Target up to 10 flashcards, 10 practice questions, and 10 quiz questions when enough context exists.
+- Generate exactly 10 flashcards, 10 practice questions, and 10 quiz questions when enough context exists.
 - If context is limited, return fewer but accurate items. Do not hallucinate specific facts.
 `;
 
