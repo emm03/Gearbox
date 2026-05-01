@@ -347,7 +347,7 @@ async function handleCompareExplainClick(goal) {
 }
 
 async function requestExplainer(payload) {
-    const response = await fetch("http://localhost:4000/api/explain", {
+    const response = await fetch("https://gearbox-nhws.onrender.com/api/explain", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -779,7 +779,7 @@ async function handleGenerateLearning() {
     }
 
     try {
-        const res = await fetch("http://localhost:4000/api/learn", {
+        const res = await fetch("https://gearbox-nhws.onrender.com/api/learn", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ store, department, specs, productName, employeeContext, productUrl })
@@ -922,6 +922,7 @@ function renderSingleFlashcardView(data) {
                 <span class="muted">Study streak: ${Math.max(1, masteredCount)} cards</span>
             </div>
         </div>
+        <div class="flashcard-progress-bar"><span style="width:${progressPercent}%"></span></div>
 
         <div class="flashcard-viewer">
             <div class="flashcard-card ${currentFlashcardFlipped ? "flipped" : ""}" id="active-flashcard">
