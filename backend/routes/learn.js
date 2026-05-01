@@ -62,6 +62,67 @@ function summaryToFlashcards(summary = "", count = 10) {
     }));
 }
 
+function normalizeFlashcard(card = {}, index = 0) {
+    const front = String(card.front || "").trim() || `What is a key product fact? (${index + 1})`;
+    const back = String(card.back || "").trim() || "Not specified in the provided product context.";
+    return { front, back };
+}
+
+function enforceFlashcardCount(flashcards = [], target = 10, summary = "") {
+    const normalized = flashcards.filter(Boolean).map(normalizeFlashcard);
+    const summaryCards = summaryToFlashcards(summary, target).map(normalizeFlashcard);
+    const out = [...normalized];
+    let cursor = 0;
+
+    while (out.length < target && summaryCards.length) {
+        out.push(summaryCards[cursor % summaryCards.length]);
+        cursor += 1;
+    }
+
+    cursor = 0;
+    while (out.length < target) {
+        const seed = normalized[cursor % Math.max(normalized.length, 1)] || {
+            front: `What does this feature help with? (${out.length + 1})`,
+            back: "It supports overall product usability and buyer fit."
+        };
+        out.push(normalizeFlashcard(seed, out.length));
+        cursor += 1;
+    }
+
+    return out.slice(0, target);
+}
+
+function buildQuestionFromFlashcard(card = {}, mode = "practice") {
+    const prompt = mode === "quiz"
+        ? `Which answer best matches: ${card.front}`
+        : `What is the answer to: ${card.front}`;
+    return normalizeQuestion({
+        question: prompt,
+        options: [
+            card.back,
+            "Not specified",
+            "A different product feature",
+            "Depends on context not provided"
+        ],
+        correctIndex: 0,
+        explanation: "Derived from flashcard source data."
+    });
+}
+
+function enforceQuestionCount(existing = [], target = 10, flashcards = [], mode = "practice") {
+    const out = existing.filter(Boolean).map(normalizeQuestion);
+    let cursor = 0;
+    while (out.length < target) {
+        const source = flashcards[cursor % Math.max(flashcards.length, 1)] || {
+            front: `What does this product help with? (${out.length + 1})`,
+            back: "It addresses the intended use case described in the module."
+        };
+        out.push(buildQuestionFromFlashcard(source, mode));
+        cursor += 1;
+    }
+    return out.slice(0, target);
+}
+
 /**
  * POST /api/learn
  */
@@ -179,35 +240,31 @@ RULES:
             });
         }
 
-        parsed.flashcards = Array.isArray(parsed.flashcards) ? parsed.flashcards.filter(Boolean).slice(0, targets.flashcards) : [];
-        parsed.practice = Array.isArray(parsed.practice) ? parsed.practice.filter(Boolean) : [];
-        parsed.quiz = Array.isArray(parsed.quiz) ? parsed.quiz.filter(Boolean) : [];
+        const initialFlashcards = Array.isArray(parsed.flashcards) ? parsed.flashcards.filter(Boolean) : [];
+        const initialPractice = Array.isArray(parsed.practice) ? parsed.practice.filter(Boolean) : [];
+        const initialQuiz = Array.isArray(parsed.quiz) ? parsed.quiz.filter(Boolean) : [];
 
-        if (parsed.flashcards.length < targets.flashcards) {
-            const summaryCards = summaryToFlashcards(parsed.summary, targets.flashcards);
-            parsed.flashcards = [...parsed.flashcards, ...summaryCards].slice(0, targets.flashcards);
-        }
+        console.log("Learn plan:", selectedPlan);
+        console.log("Learn targets:", targets);
+        console.log("Before enforcement:", {
+            flashcards: initialFlashcards.length,
+            practice: initialPractice.length,
+            quiz: initialQuiz.length
+        });
 
-        if (parsed.flashcards.length < targets.flashcards && parsed.flashcards.length > 0) {
-            const seedCards = [...parsed.flashcards];
-            while (parsed.flashcards.length < targets.flashcards) {
-                const source = seedCards[parsed.flashcards.length % seedCards.length] || {};
-                parsed.flashcards.push({
-                    front: source.front || "Product fact review",
-                    back: source.back || "Review product details for this item."
-                });
-            }
-        }
+        const finalFlashcards = enforceFlashcardCount(initialFlashcards, targets.flashcards, parsed.summary);
+        const finalPractice = enforceQuestionCount(initialPractice, targets.practice, finalFlashcards, "practice");
+        const finalQuiz = enforceQuestionCount(initialQuiz, targets.quiz, finalFlashcards, "quiz");
 
-        if (parsed.practice.length < targets.practice) {
-            parsed.practice = [...parsed.practice, ...buildFallbackQuestions(parsed.flashcards, targets.practice)].slice(0, targets.practice);
-        }
-        if (parsed.quiz.length < targets.quiz) {
-            parsed.quiz = [...parsed.quiz, ...buildFallbackQuestions(parsed.flashcards, targets.quiz)].slice(0, targets.quiz);
-        }
+        console.log("After enforcement:", {
+            flashcards: finalFlashcards.length,
+            practice: finalPractice.length,
+            quiz: finalQuiz.length
+        });
 
-        parsed.practice = parsed.practice.slice(0, targets.practice).map(normalizeQuestion);
-        parsed.quiz = parsed.quiz.slice(0, targets.quiz).map(normalizeQuestion);
+        parsed.flashcards = finalFlashcards;
+        parsed.practice = finalPractice;
+        parsed.quiz = finalQuiz;
 
         res.json(parsed);
 
