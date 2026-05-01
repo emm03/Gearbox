@@ -347,7 +347,7 @@ async function handleCompareExplainClick(goal) {
 }
 
 async function requestExplainer(payload) {
-    const response = await fetch("http://localhost:4000/api/explain", {
+    const response = await fetch("https://gearbox-nhws.onrender.com/api/explain", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
@@ -494,6 +494,256 @@ function renderDecisionPath(data) {
             </div>
         </article>
     `;
+    panel.classList.remove("hidden");
+}
+
+async function applyRefinementFocus(focus) {
+    const buyerContextEl = document.getElementById("single-buyer-context");
+    if (!buyerContextEl) return;
+
+    const notes = {
+        comfort: "Priority: Comfort matters most.",
+        budget: "Priority: Budget matters most.",
+        performance: "Priority: Performance matters most."
+    };
+    const note = notes[focus];
+    if (!note) return;
+
+    if (!buyerContextEl.value.includes(note)) {
+        buyerContextEl.value = [buyerContextEl.value.trim(), note].filter(Boolean).join("\n");
+    }
+
+    const panel = document.getElementById("decision-inline-panel");
+    if (panel) {
+        panel.innerHTML += `<p class="decision-inline-note">Refreshing guidance with your new priority: ${escapeHtml(note)}</p>`;
+    }
+
+    await handleSingleExplainClick("Is this right for me?");
+}
+
+function getCategoryLearningBullets(category) {
+    if (category === "Bike") {
+        return ["Fit and frame size", "Brake type", "Tire width", "Gearing range", "Intended terrain"];
+    }
+    return ["Fit for your use case", "Comfort over long sessions", "Durability and maintenance", "Core performance specs", "Total ownership cost"];
+}
+
+function inferDecisionLabel(quickVerdict, recommendation) {
+    const joined = `${quickVerdict || ""} ${recommendation || ""}`.toLowerCase();
+    if (/(not recommended|avoid|skip|poor fit|don'?t buy|bad fit)/.test(joined)) {
+        return { key: "not-recommended", label: "Not recommended" };
+    }
+    if (/(good fit|strong fit|recommended|buy|worth it|great option)/.test(joined)) {
+        return { key: "good-fit", label: "Good fit" };
+    }
+    return { key: "maybe", label: "Maybe" };
+}
+
+function renderDecisionInlinePanel(mode) {
+    const panel = document.getElementById("decision-inline-panel");
+    if (!panel) return;
+
+    if (mode === "refine") {
+        panel.innerHTML = `
+            <p class="decision-inline-title">Refine my needs</p>
+            <div class="decision-actions">
+                <button class="decision-btn" type="button" data-refine-focus="comfort">Comfort matters most</button>
+                <button class="decision-btn" type="button" data-refine-focus="budget">Budget matters most</button>
+                <button class="decision-btn" type="button" data-refine-focus="performance">Performance matters most</button>
+            </div>
+            <p class="decision-inline-note">Pick one to tighten guidance. We will update buyer context and refresh the recommendation.</p>
+        `;
+        panel.classList.remove("hidden");
+        return;
+    }
+
+    const category = document.getElementById("single-category")?.value || "";
+    const bullets = getCategoryLearningBullets(category);
+    panel.innerHTML = `
+        <p class="decision-inline-title">What matters most for ${escapeHtml(category || "this category")}</p>
+        <ul>${bullets.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+    `;
+    panel.classList.remove("hidden");
+}
+
+async function applyRefinementFocus(focus) {
+    const buyerContextEl = document.getElementById("single-buyer-context");
+    if (!buyerContextEl) return;
+
+    const notes = {
+        comfort: "Priority: Comfort matters most.",
+        budget: "Priority: Budget matters most.",
+        performance: "Priority: Performance matters most."
+    };
+    const note = notes[focus];
+    if (!note) return;
+
+    if (!buyerContextEl.value.includes(note)) {
+        buyerContextEl.value = [buyerContextEl.value.trim(), note].filter(Boolean).join("\n");
+    }
+
+    const panel = document.getElementById("decision-inline-panel");
+    if (panel) {
+        panel.innerHTML += `<p class="decision-inline-note">Refreshing guidance with your new priority: ${escapeHtml(note)}</p>`;
+    }
+
+    await handleSingleExplainClick("Is this right for me?");
+}
+
+function getCategoryLearningBullets(category) {
+    if (category === "Bike") {
+        return ["Fit and frame size", "Brake type", "Tire width", "Gearing range", "Intended terrain"];
+    }
+    return ["Fit for your use case", "Comfort over long sessions", "Durability and maintenance", "Core performance specs", "Total ownership cost"];
+}
+
+function inferDecisionLabel(quickVerdict, recommendation) {
+    const joined = `${quickVerdict || ""} ${recommendation || ""}`.toLowerCase();
+    if (/(not recommended|avoid|skip|poor fit|don'?t buy|bad fit)/.test(joined)) {
+        return { key: "not-recommended", label: "Not recommended" };
+    }
+    if (/(good fit|strong fit|recommended|buy|worth it|great option)/.test(joined)) {
+        return { key: "good-fit", label: "Good fit" };
+    }
+    return { key: "maybe", label: "Maybe" };
+}
+
+function renderDecisionInlinePanel(mode) {
+    const panel = document.getElementById("decision-inline-panel");
+    if (!panel) return;
+
+    if (mode === "refine") {
+        panel.innerHTML = `
+            <p class="decision-inline-title">Refine my needs</p>
+            <div class="decision-actions">
+                <button class="decision-btn" type="button" data-refine-focus="comfort">Comfort matters most</button>
+                <button class="decision-btn" type="button" data-refine-focus="budget">Budget matters most</button>
+                <button class="decision-btn" type="button" data-refine-focus="performance">Performance matters most</button>
+            </div>
+            <p class="decision-inline-note">Pick one to tighten guidance. We will update buyer context and refresh the recommendation.</p>
+        `;
+        panel.classList.remove("hidden");
+        return;
+    }
+
+    const category = document.getElementById("single-category")?.value || "";
+    const bullets = getCategoryLearningBullets(category);
+    panel.innerHTML = `
+        <p class="decision-inline-title">What matters most for ${escapeHtml(category || "this category")}</p>
+        <ul>${bullets.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+    `;
+    panel.classList.remove("hidden");
+}
+
+async function applyRefinementFocus(focus) {
+    const buyerContextEl = document.getElementById("single-buyer-context");
+    if (!buyerContextEl) return;
+
+    const notes = {
+        comfort: "Priority: Comfort matters most.",
+        budget: "Priority: Budget matters most.",
+        performance: "Priority: Performance matters most."
+    };
+    const note = notes[focus];
+    if (!note) return;
+
+    if (!buyerContextEl.value.includes(note)) {
+        buyerContextEl.value = [buyerContextEl.value.trim(), note].filter(Boolean).join("\n");
+    }
+
+    const panel = document.getElementById("decision-inline-panel");
+    if (panel) {
+        panel.innerHTML += `<p class="decision-inline-note">Refreshing guidance with your new priority: ${escapeHtml(note)}</p>`;
+    }
+
+    await handleSingleExplainClick("Is this right for me?");
+}
+
+function getCategoryLearningBullets(category) {
+    if (category === "Bike") {
+        return ["Fit and frame size", "Brake type", "Tire width", "Gearing range", "Intended terrain"];
+    }
+    return ["Fit for your use case", "Comfort over long sessions", "Durability and maintenance", "Core performance specs", "Total ownership cost"];
+}
+
+function inferDecisionLabel(quickVerdict, recommendation) {
+    const joined = `${quickVerdict || ""} ${recommendation || ""}`.toLowerCase();
+    if (/(not recommended|avoid|skip|poor fit|don'?t buy|bad fit)/.test(joined)) {
+        return { key: "not-recommended", label: "Not recommended" };
+    }
+    if (/(good fit|strong fit|recommended|buy|worth it|great option)/.test(joined)) {
+        return { key: "good-fit", label: "Good fit" };
+    }
+    return { key: "maybe", label: "Maybe" };
+}
+
+function renderDecisionInlinePanel(mode) {
+    const panel = document.getElementById("decision-inline-panel");
+    if (!panel) return;
+
+    if (mode === "refine") {
+        panel.innerHTML = `
+            <p class="decision-inline-title">Refine my needs</p>
+            <div class="decision-actions">
+                <button class="decision-btn" type="button" data-refine-focus="comfort">Comfort matters most</button>
+                <button class="decision-btn" type="button" data-refine-focus="budget">Budget matters most</button>
+                <button class="decision-btn" type="button" data-refine-focus="performance">Performance matters most</button>
+            </div>
+            <p class="decision-inline-note">Pick one to tighten guidance. We will update buyer context and refresh the recommendation.</p>
+        `;
+        panel.classList.remove("hidden");
+        return;
+    }
+
+    const category = document.getElementById("single-category")?.value || "";
+    const bullets = getCategoryLearningBullets(category);
+    panel.innerHTML = `
+        <p class="decision-inline-title">What matters most for ${escapeHtml(category || "this category")}</p>
+        <ul>${bullets.map(item => `<li>${escapeHtml(item)}</li>`).join("")}</ul>
+    `;
+    panel.classList.remove("hidden");
+}
+
+async function applyRefinementFocus(focus) {
+    const buyerContextEl = document.getElementById("single-buyer-context");
+    if (!buyerContextEl) return;
+
+    const notes = {
+        comfort: "Priority: Comfort matters most.",
+        budget: "Priority: Budget matters most.",
+        performance: "Priority: Performance matters most."
+    };
+    const note = notes[focus];
+    if (!note) return;
+
+    if (!buyerContextEl.value.includes(note)) {
+        buyerContextEl.value = [buyerContextEl.value.trim(), note].filter(Boolean).join("\n");
+    }
+
+    const panel = document.getElementById("decision-inline-panel");
+    if (panel) {
+        panel.innerHTML += `<p class="decision-inline-note">Refreshing guidance with your new priority: ${escapeHtml(note)}</p>`;
+    }
+
+    await handleSingleExplainClick("Is this right for me?");
+}
+
+function getCategoryLearningBullets(category) {
+    if (category === "Bike") {
+        return ["Fit and frame size", "Brake type", "Tire width", "Gearing range", "Intended terrain"];
+    }
+    return ["Fit for your use case", "Comfort over long sessions", "Durability and maintenance", "Core performance specs", "Total ownership cost"];
+}
+
+function inferDecisionLabel(quickVerdict, recommendation) {
+    const joined = `${quickVerdict || ""} ${recommendation || ""}`.toLowerCase();
+    if (/(not recommended|avoid|skip|poor fit|don'?t buy|bad fit)/.test(joined)) {
+        return { key: "not-recommended", label: "Not recommended" };
+    }
+    if (/(good fit|strong fit|recommended|buy|worth it|great option)/.test(joined)) {
+        return { key: "good-fit", label: "Good fit" };
+    }
+    return { key: "maybe", label: "Maybe" };
 }
 
 function renderDecisionInlinePanel(mode) {
@@ -731,8 +981,6 @@ let currentQuizIndex = 0;
 let currentQuizScore = 0;
 let currentQuizAnswered = false;
 let flashcardMastery = {};
-let currentPracticeIndex = 0;
-let currentPracticeAnswered = false;
 
 /*************************************************
  * LEARN MODE
@@ -761,7 +1009,6 @@ async function handleGenerateLearning() {
 
     const flashcardsContainer = document.getElementById("flashcards-container");
     const quizContainer = document.getElementById("quiz-container");
-    const practiceContainer = document.getElementById("practice-container");
 
     if (btn) {
         btn.disabled = true;
@@ -776,12 +1023,9 @@ async function handleGenerateLearning() {
     if (quizContainer) {
         quizContainer.innerHTML = `<p>Generating quiz...</p>`;
     }
-    if (practiceContainer) {
-        practiceContainer.innerHTML = `<p>Generating practice mode...</p>`;
-    }
 
     try {
-        const res = await fetch("http://localhost:4000/api/learn", {
+        const res = await fetch("https://gearbox-nhws.onrender.com/api/learn", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ store, department, specs, productName, employeeContext })
@@ -800,8 +1044,6 @@ async function handleGenerateLearning() {
         currentQuizScore = 0;
         currentQuizAnswered = false;
         flashcardMastery = {};
-        currentPracticeIndex = 0;
-        currentPracticeAnswered = false;
 
         renderLearningModule(data);
         document.getElementById("study-modes")?.classList.remove("hidden");
@@ -836,7 +1078,6 @@ function renderLearningModule(data) {
     renderTrainingSummary(data);
     renderTrainingCoach(data);
     renderSingleFlashcardView(data);
-    renderPracticeView(data);
     renderQuizView(data);
 }
 
@@ -924,15 +1165,6 @@ function renderSingleFlashcardView(data) {
             <span class="muted">Study streak: ${Math.max(1, masteredCount)} cards</span>
         </div>
         <div class="flashcard-progress-bar"><span style="width:${progressPercent}%"></span></div>
-        <div class="card-status-row">
-            <div class="status-chips">
-                <span class="status-chip ${cardStatus === "new" ? "active" : ""}">New</span>
-                <span class="status-chip ${cardStatus === "learning" ? "active" : ""}">Learning</span>
-                <span class="status-chip ${cardStatus === "mastered" ? "active" : ""}">Mastered</span>
-            </div>
-            <span class="muted">Study streak: ${Math.max(1, masteredCount)} cards</span>
-        </div>
-        <div class="flashcard-progress-bar"><span style="width:${progressPercent}%"></span></div>
 
         <div class="flashcard-viewer">
             <div class="flashcard-card ${currentFlashcardFlipped ? "flipped" : ""}" id="active-flashcard">
@@ -947,13 +1179,9 @@ function renderSingleFlashcardView(data) {
         </div>
 
         <div class="flashcard-controls">
-            <button class="flashcard-arrow-btn" id="flashcard-prev-btn" ${currentFlashcardIndex === 0 ? "disabled" : ""} aria-label="Previous card">←</button>
-            <button class="flashcard-flip-btn" id="flashcard-flip-btn" aria-label="Flip card">↻ Flip</button>
-            <button class="flashcard-arrow-btn" id="flashcard-next-btn" ${currentFlashcardIndex === flashcards.length - 1 ? "disabled" : ""} aria-label="Next card">→</button>
-        </div>
-        <div class="flashcard-learning-controls">
-            <button id="mark-mastered-btn" class="${flashcardMastery[currentFlashcardIndex] === "mastered" ? "active" : ""}">Mastered</button>
-            <button id="mark-learning-btn" class="${flashcardMastery[currentFlashcardIndex] === "learning" ? "active" : ""}">Still learning</button>
+            <button id="flashcard-prev-btn" ${currentFlashcardIndex === 0 ? "disabled" : ""}>Previous</button>
+            <button id="flashcard-flip-btn">Flip</button>
+            <button id="flashcard-next-btn" ${currentFlashcardIndex === flashcards.length - 1 ? "disabled" : ""}>Next</button>
         </div>
         <div class="flashcard-learning-controls">
             <button id="mark-mastered-btn" class="${flashcardMastery[currentFlashcardIndex] === "mastered" ? "active" : ""}">Mastered</button>
@@ -1030,59 +1258,6 @@ function renderSingleFlashcardView(data) {
             renderSingleFlashcardView(currentLearningData);
         }
     };
-}
-
-function renderPracticeView(data) {
-    const container = document.getElementById("practice-container");
-    if (!container) return;
-    const quiz = Array.isArray(data.quiz) ? data.quiz : [];
-    if (!quiz.length) {
-        container.innerHTML = `<p>No practice questions available yet.</p>`;
-        return;
-    }
-    const q = quiz[Math.min(currentPracticeIndex, quiz.length - 1)] || {};
-    const options = Array.isArray(q.options) ? q.options : [];
-    const progress = Math.round(((currentPracticeIndex + 1) / quiz.length) * 100);
-    container.innerHTML = `
-        <div class="quiz-question">
-            <p class="quiz-progress">Practice ${currentPracticeIndex + 1} of ${quiz.length}</p>
-            <div class="quiz-progress-bar"><span style="width:${progress}%"></span></div>
-            <p><strong>${escapeHtml(q.question || "No question generated.")}</strong></p>
-            <div class="quiz-options">
-                ${options.map((opt, idx) => `<button class="quiz-option" type="button" data-practice-option="${idx}" ${currentPracticeAnswered ? "disabled" : ""}>${escapeHtml(opt)}</button>`).join("")}
-            </div>
-            <p class="quiz-feedback" id="practice-feedback"></p>
-            <div class="flashcard-controls">
-                <button class="decision-btn" id="practice-dont-know-btn" type="button">Don't know?</button>
-                <button class="decision-btn primary ${currentPracticeAnswered ? "" : "hidden"}" id="practice-next-btn" type="button">Next</button>
-            </div>
-        </div>
-    `;
-    const feedback = document.getElementById("practice-feedback");
-    container.querySelectorAll("[data-practice-option]").forEach(btn => btn.addEventListener("click", () => {
-        if (currentPracticeAnswered) return;
-        currentPracticeAnswered = true;
-        const selected = Number(btn.dataset.practiceOption);
-        const correct = Number(q.correctIndex);
-        const correctBtn = container.querySelector(`[data-practice-option="${correct}"]`);
-        const isCorrect = selected === correct;
-        btn.classList.add(isCorrect ? "correct" : "incorrect");
-        correctBtn?.classList.add("correct");
-        container.querySelectorAll("[data-practice-option]").forEach(el => el.disabled = true);
-        if (feedback) feedback.textContent = isCorrect ? "Correct." : `Correct answer: ${options[correct] || "N/A"}`;
-        document.getElementById("practice-next-btn")?.classList.remove("hidden");
-    }));
-    document.getElementById("practice-dont-know-btn")?.addEventListener("click", () => {
-        if (currentPracticeAnswered) return;
-        currentPracticeAnswered = true;
-        if (feedback) feedback.textContent = "No problem. Review the flashcard and try the next one.";
-        document.getElementById("practice-next-btn")?.classList.remove("hidden");
-    });
-    document.getElementById("practice-next-btn")?.addEventListener("click", () => {
-        currentPracticeIndex = (currentPracticeIndex + 1) % quiz.length;
-        currentPracticeAnswered = false;
-        renderPracticeView(currentLearningData);
-    });
 }
 
 function renderQuizView(data) {
