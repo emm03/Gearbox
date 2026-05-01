@@ -34,6 +34,7 @@
             <div class="learn-tabs">
                 <button class="learn-tab active" data-tab="setup-tab">Setup</button>
                 <button class="learn-tab" data-tab="flashcards-tab">Flashcards</button>
+                <button class="learn-tab" data-tab="practice-tab">Practice</button>
                 <button class="learn-tab" data-tab="quiz-tab">Quiz</button>
             </div>
             <div class="study-modes hidden" id="study-modes">
@@ -137,6 +138,13 @@
                     <h2>Quiz</h2>
                     <p class="muted">Answer one question at a time and get instant feedback.</p>
                     <div id="quiz-container"><p class="empty-state">No quiz yet. Generate a module in Setup.</p></div>
+                </div>
+            </div>
+            <div class="learn-tab-content" id="practice-tab">
+                <div class="quiz-panel">
+                    <h2>Practice</h2>
+                    <p class="muted">Learn mode: one question at a time with instant feedback.</p>
+                    <div id="practice-container"><p class="empty-state">No practice set yet. Generate a module in Setup.</p></div>
                 </div>
             </div>
         </section>
