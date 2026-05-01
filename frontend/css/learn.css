@@ -108,6 +108,7 @@ body {
 .learn-inline-success { color: #b6f8e0; }
 
 .flashcard-progress { text-align: center; margin-bottom: 0.5rem; color:#c8d6fb; font-weight:700; }
+.flashcard-header { margin-bottom: 0.5rem; }
 .flashcard-viewer { display:flex; justify-content:center; perspective:1500px; margin: 0.3rem auto; }
 .flashcard-card { width:100%; max-width:820px; min-height:420px; position:relative; transform-style:preserve-3d; transition:transform .6s cubic-bezier(.2,.8,.2,1); cursor:pointer; }
 .flashcard-card.flipped { transform: rotateY(180deg) scale(1.01); }

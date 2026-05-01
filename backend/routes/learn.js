@@ -92,7 +92,8 @@ RULES:
 - No markdown
 - No extra text
 - JSON only
-- Generate exactly 10 flashcards, 10 practice questions, and 10 quiz questions when enough context exists.
+- If product context is sufficient, you MUST generate exactly 10 flashcards, exactly 10 practice questions, and exactly 10 quiz questions.
+- Do not stop at 3-4 items when the URL/specs include enough features to produce a full set.
 - If context is limited, return fewer but accurate items. Do not hallucinate specific facts.
 `;
 

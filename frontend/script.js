@@ -494,49 +494,6 @@ function renderDecisionPath(data) {
             </div>
         </article>
     `;
-    panel.classList.remove("hidden");
-}
-
-async function applyRefinementFocus(focus) {
-    const buyerContextEl = document.getElementById("single-buyer-context");
-    if (!buyerContextEl) return;
-
-    const notes = {
-        comfort: "Priority: Comfort matters most.",
-        budget: "Priority: Budget matters most.",
-        performance: "Priority: Performance matters most."
-    };
-    const note = notes[focus];
-    if (!note) return;
-
-    if (!buyerContextEl.value.includes(note)) {
-        buyerContextEl.value = [buyerContextEl.value.trim(), note].filter(Boolean).join("\n");
-    }
-
-    const panel = document.getElementById("decision-inline-panel");
-    if (panel) {
-        panel.innerHTML += `<p class="decision-inline-note">Refreshing guidance with your new priority: ${escapeHtml(note)}</p>`;
-    }
-
-    await handleSingleExplainClick("Is this right for me?");
-}
-
-function getCategoryLearningBullets(category) {
-    if (category === "Bike") {
-        return ["Fit and frame size", "Brake type", "Tire width", "Gearing range", "Intended terrain"];
-    }
-    return ["Fit for your use case", "Comfort over long sessions", "Durability and maintenance", "Core performance specs", "Total ownership cost"];
-}
-
-function inferDecisionLabel(quickVerdict, recommendation) {
-    const joined = `${quickVerdict || ""} ${recommendation || ""}`.toLowerCase();
-    if (/(not recommended|avoid|skip|poor fit|don'?t buy|bad fit)/.test(joined)) {
-        return { key: "not-recommended", label: "Not recommended" };
-    }
-    if (/(good fit|strong fit|recommended|buy|worth it|great option)/.test(joined)) {
-        return { key: "good-fit", label: "Good fit" };
-    }
-    return { key: "maybe", label: "Maybe" };
 }
 
 function renderDecisionInlinePanel(mode) {
@@ -949,37 +906,21 @@ function renderSingleFlashcardView(data) {
     const masteredCount = Object.values(flashcardMastery).filter(v => v === "mastered").length;
     const cardStatus = flashcardMastery[currentFlashcardIndex] || "new";
     flashcardsContainer.innerHTML = `
-        <div class="flashcard-progress">Card ${currentFlashcardIndex + 1} of ${flashcards.length}</div>
-        <div class="flashcard-progress-meta">
-            <span>Cards mastered: ${masteredCount}</span>
-            <span>Progress: ${progressPercent}%</span>
-        </div>
-        <div class="flashcard-progress-bar"><span style="width:${progressPercent}%"></span></div>
-        <div class="card-status-row">
-            <div class="status-chips">
-                <span class="status-chip ${cardStatus === "new" ? "active" : ""}">New</span>
-                <span class="status-chip ${cardStatus === "learning" ? "active" : ""}">Learning</span>
-                <span class="status-chip ${cardStatus === "mastered" ? "active" : ""}">Mastered</span>
+        <div class="flashcard-header">
+            <div class="flashcard-progress">Card ${currentFlashcardIndex + 1} of ${flashcards.length}</div>
+            <div class="flashcard-progress-meta">
+                <span>Cards mastered: ${masteredCount}</span>
+                <span>Progress: ${progressPercent}%</span>
             </div>
-            <span class="muted">Study streak: ${Math.max(1, masteredCount)} cards</span>
-        </div>
-        <div class="flashcard-progress-bar"><span style="width:${progressPercent}%"></span></div>
-        <div class="card-status-row">
-            <div class="status-chips">
-                <span class="status-chip ${cardStatus === "new" ? "active" : ""}">New</span>
-                <span class="status-chip ${cardStatus === "learning" ? "active" : ""}">Learning</span>
-                <span class="status-chip ${cardStatus === "mastered" ? "active" : ""}">Mastered</span>
+            <div class="flashcard-progress-bar"><span style="width:${progressPercent}%"></span></div>
+            <div class="card-status-row">
+                <div class="status-chips">
+                    <span class="status-chip ${cardStatus === "new" ? "active" : ""}">New</span>
+                    <span class="status-chip ${cardStatus === "learning" ? "active" : ""}">Learning</span>
+                    <span class="status-chip ${cardStatus === "mastered" ? "active" : ""}">Mastered</span>
+                </div>
+                <span class="muted">Study streak: ${Math.max(1, masteredCount)} cards</span>
             </div>
-            <span class="muted">Study streak: ${Math.max(1, masteredCount)} cards</span>
-        </div>
-        <div class="flashcard-progress-bar"><span style="width:${progressPercent}%"></span></div>
-        <div class="card-status-row">
-            <div class="status-chips">
-                <span class="status-chip ${cardStatus === "new" ? "active" : ""}">New</span>
-                <span class="status-chip ${cardStatus === "learning" ? "active" : ""}">Learning</span>
-                <span class="status-chip ${cardStatus === "mastered" ? "active" : ""}">Mastered</span>
-            </div>
-            <span class="muted">Study streak: ${Math.max(1, masteredCount)} cards</span>
         </div>
         <div class="flashcard-progress-bar"><span style="width:${progressPercent}%"></span></div>
 
