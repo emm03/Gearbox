@@ -51,6 +51,17 @@ function buildFallbackQuestions(flashcards = [], count = 10) {
     }));
 }
 
+function summaryToFlashcards(summary = "", count = 10) {
+    const bits = String(summary || "")
+        .split(/[.!?]\s+/)
+        .map(s => s.trim())
+        .filter(Boolean);
+    return bits.slice(0, count).map((bit, idx) => ({
+        front: `What is a key point about this product? (${idx + 1})`,
+        back: bit
+    }));
+}
+
 /**
  * POST /api/learn
  */
@@ -172,14 +183,19 @@ RULES:
         parsed.practice = Array.isArray(parsed.practice) ? parsed.practice.filter(Boolean) : [];
         parsed.quiz = Array.isArray(parsed.quiz) ? parsed.quiz.filter(Boolean) : [];
 
+        if (parsed.flashcards.length < targets.flashcards) {
+            const summaryCards = summaryToFlashcards(parsed.summary, targets.flashcards);
+            parsed.flashcards = [...parsed.flashcards, ...summaryCards].slice(0, targets.flashcards);
+        }
+
         if (parsed.flashcards.length < targets.flashcards && parsed.flashcards.length > 0) {
+            const seedCards = [...parsed.flashcards];
             while (parsed.flashcards.length < targets.flashcards) {
-                const source = parsed.flashcards[parsed.flashcards.length % Math.max(parsed.flashcards.length, 1)] || {};
+                const source = seedCards[parsed.flashcards.length % seedCards.length] || {};
                 parsed.flashcards.push({
                     front: source.front || "Product fact review",
                     back: source.back || "Review product details for this item."
                 });
-                if (parsed.flashcards.length > targets.flashcards) break;
             }
         }
 

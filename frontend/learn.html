@@ -73,6 +73,11 @@
 
                         <label for="employee-context">Employee context (optional)</label>
                         <textarea id="employee-context" rows="3" placeholder="e.g. I need to explain this to first-time commuters."></textarea>
+                        <label for="module-size">Module size</label>
+                        <select id="module-size">
+                            <option value="free">Free demo, 10 each</option>
+                            <option value="pro">Pro preview, 30 each</option>
+                        </select>
 
                             <button id="generate-learning-btn" class="btn-primary">Generate Learning Module</button>
                             <div id="learn-status" class="learn-status"><p>Tip: richer specs produce better cards and quiz questions.</p></div>
@@ -86,29 +91,10 @@
                             <article class="dashboard-stat"><p>Quiz questions</p><h3>0</h3></article>
                             <article class="dashboard-stat"><p>Mastered count</p><h3>0</h3></article>
                         </div>
-                        <article class="learn-summary-card">
-                            <h3>Training progress</h3>
-                            <p>Use Setup, then review flashcards and quiz in order.</p>
-                            <ul>
-                                <li>1) Generate module from specs</li>
-                                <li>2) Study flashcards</li>
-                                <li>3) Complete quiz and review score</li>
-                            </ul>
-                        </article>
-                        <div id="training-summary" class="training-summary">
-                            <article class="learn-summary-card empty">
-                                <h3>Training Summary</h3>
-                                <p>Generate a module to get overview, talking points, objections, and fit guidance.</p>
-                            </article>
-                        </div>
-                        <div id="training-coach" class="training-summary">
+                        <div id="module-status" class="training-summary">
                             <article class="learn-summary-card">
-                                <h3>Training Coach</h3>
-                                <ul>
-                                    <li>Practice saying the one-sentence pitch out loud.</li>
-                                    <li>Review missed cards before taking the quiz.</li>
-                                    <li>Focus on objections customers may ask.</li>
-                                </ul>
+                                <h3>Module status</h3>
+                                <p>Generate a module to see counts and estimated study time.</p>
                             </article>
                         </div>
                     </div>

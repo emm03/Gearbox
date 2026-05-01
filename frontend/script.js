@@ -494,49 +494,6 @@ function renderDecisionPath(data) {
             </div>
         </article>
     `;
-    panel.classList.remove("hidden");
-}
-
-async function applyRefinementFocus(focus) {
-    const buyerContextEl = document.getElementById("single-buyer-context");
-    if (!buyerContextEl) return;
-
-    const notes = {
-        comfort: "Priority: Comfort matters most.",
-        budget: "Priority: Budget matters most.",
-        performance: "Priority: Performance matters most."
-    };
-    const note = notes[focus];
-    if (!note) return;
-
-    if (!buyerContextEl.value.includes(note)) {
-        buyerContextEl.value = [buyerContextEl.value.trim(), note].filter(Boolean).join("\n");
-    }
-
-    const panel = document.getElementById("decision-inline-panel");
-    if (panel) {
-        panel.innerHTML += `<p class="decision-inline-note">Refreshing guidance with your new priority: ${escapeHtml(note)}</p>`;
-    }
-
-    await handleSingleExplainClick("Is this right for me?");
-}
-
-function getCategoryLearningBullets(category) {
-    if (category === "Bike") {
-        return ["Fit and frame size", "Brake type", "Tire width", "Gearing range", "Intended terrain"];
-    }
-    return ["Fit for your use case", "Comfort over long sessions", "Durability and maintenance", "Core performance specs", "Total ownership cost"];
-}
-
-function inferDecisionLabel(quickVerdict, recommendation) {
-    const joined = `${quickVerdict || ""} ${recommendation || ""}`.toLowerCase();
-    if (/(not recommended|avoid|skip|poor fit|don'?t buy|bad fit)/.test(joined)) {
-        return { key: "not-recommended", label: "Not recommended" };
-    }
-    if (/(good fit|strong fit|recommended|buy|worth it|great option)/.test(joined)) {
-        return { key: "good-fit", label: "Good fit" };
-    }
-    return { key: "maybe", label: "Maybe" };
 }
 
 function renderDecisionInlinePanel(mode) {
@@ -788,6 +745,7 @@ function initLearnMode() {
 async function handleGenerateLearning() {
     const store = document.getElementById("store-select")?.value || "";
     const department = document.getElementById("department-select")?.value || "";
+    const moduleSize = document.getElementById("module-size")?.value || "free";
     const productName = document.getElementById("learn-product-name")?.value.trim() || "";
     const productUrl = document.getElementById("learn-product-url")?.value.trim() || "";
     const employeeContext = document.getElementById("employee-context")?.value.trim() || "";
@@ -825,7 +783,7 @@ async function handleGenerateLearning() {
         const res = await fetch("https://gearbox-nhws.onrender.com/api/learn", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ store, department, specs, productName, employeeContext, productUrl, plan: "free" })
+            body: JSON.stringify({ store, department, specs, productName, employeeContext, productUrl, plan: moduleSize })
         });
 
         const data = await res.json();
@@ -873,8 +831,7 @@ async function handleGenerateLearning() {
 
 function renderLearningModule(data) {
     renderTrainingDashboard(data);
-    renderTrainingSummary(data);
-    renderTrainingCoach(data);
+    renderModuleStatus(data);
     renderSingleFlashcardView(data);
     renderPracticeView(data);
     renderQuizView(data);
@@ -895,37 +852,20 @@ function renderTrainingDashboard(data) {
     `;
 }
 
-function renderTrainingCoach(data) {
-    const container = document.getElementById("training-coach");
+function renderModuleStatus(data) {
+    const container = document.getElementById("module-status");
     if (!container) return;
-    const tips = listOrEmpty(data.coachingTips || data.trainingTips).slice(0, 3);
-    const fallbackTips = [
-        "Practice saying the one-sentence pitch out loud.",
-        "Review missed cards before taking the quiz.",
-        "Focus on objections customers may ask."
-    ];
-    const items = tips.length ? tips : fallbackTips;
-    container.innerHTML = `<article class="learn-summary-card"><h3>Training Coach</h3>${listToHtml(items, "No coaching tips available.")}</article>`;
-}
-
-function renderTrainingSummary(data) {
-    const container = document.getElementById("training-summary");
-    if (!container) return;
-
-    const overview = paragraphOrFallback(data.summary || data.productOverview, "Overview will appear after generation.");
-    const talkingPoints = listOrEmpty(data.topTalkingPoints || data.talkingPoints);
-    const objections = listOrEmpty(data.commonObjections || data.objections);
-    const fit = listOrEmpty(data.bestFit || data.bestFor);
-    const notFit = listOrEmpty(data.notBestFit || data.notIdealFor);
-
+    const flashcards = Array.isArray(data.flashcards) ? data.flashcards.length : 0;
+    const practice = Array.isArray(data.practice) ? data.practice.length : 0;
+    const quiz = Array.isArray(data.quiz) ? data.quiz.length : 0;
+    const estimateMinutes = Math.max(5, Math.round((flashcards * 0.5) + (practice * 0.35) + (quiz * 0.35)));
     container.innerHTML = `
         <article class="learn-summary-card">
-            <h3>Training Summary</h3>
-            <p>${escapeHtml(overview)}</p>
-            <p><strong>Top talking points</strong></p>
-            ${listToHtml(talkingPoints.slice(0, 3), "No talking points generated yet.")}
-            <p><strong>Likely objections</strong></p>
-            ${listToHtml(objections.slice(0, 3), "No objections generated yet.")}
+            <h3>Module status</h3>
+            <p>Flashcards generated: <strong>${flashcards}</strong></p>
+            <p>Practice questions: <strong>${practice}</strong></p>
+            <p>Quiz questions: <strong>${quiz}</strong></p>
+            <p>Estimated study time: <strong>${estimateMinutes} min</strong></p>
         </article>
     `;
 }
