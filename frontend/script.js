@@ -1021,6 +1021,7 @@ function renderSingleFlashcardView(data) {
                 <span class="muted">Study streak: ${Math.max(1, masteredCount)} cards</span>
             </div>
         </div>
+        <div class="flashcard-progress-bar"><span style="width:${progressPercent}%"></span></div>
 
         <div class="flashcard-viewer">
             <div class="flashcard-card ${currentFlashcardFlipped ? "flipped" : ""}" id="active-flashcard">
