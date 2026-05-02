@@ -44,24 +44,50 @@
     };
     const addMessage = (role, content) => { state.messages.push({ role, content }); renderLog(); };
 
+    const getDraftContext = () => {
+        if (pageMode === "learn") {
+            const draft = {
+                store: document.getElementById("store-select")?.value || "",
+                department: document.getElementById("department-select")?.value || "",
+                productName: document.getElementById("learn-product-name")?.value || "",
+                productUrl: document.getElementById("learn-product-url")?.value || "",
+                specs: document.getElementById("product-specs")?.value || "",
+                employeeContext: document.getElementById("employee-context")?.value || "",
+                moduleSize: document.getElementById("module-size")?.value || "free"
+            };
+            return Object.values(draft).some(Boolean) ? JSON.stringify(draft) : "";
+        }
+        const draft = {
+            productName: document.getElementById("single-product-name")?.value || "",
+            productLink: document.getElementById("single-product-link")?.value || "",
+            specs: document.getElementById("single-product-specs")?.value || "",
+            buyerContext: document.getElementById("single-buyer-context")?.value || "",
+            category: document.getElementById("single-category")?.value || "",
+            store: document.getElementById("single-store")?.value || ""
+        };
+        return Object.values(draft).some(Boolean) ? JSON.stringify(draft) : "";
+    };
+
     const getContext = () => {
         const ctx = window.gearboxContext || {};
         if (pageMode === "learn") {
-            if (!ctx.latestLearn) return "";
-            return JSON.stringify(ctx.latestLearn).slice(0, 4000);
+            if (ctx.latestLearn) return { status: "generated", context: JSON.stringify(ctx.latestLearn).slice(0, 4000) };
+            const draft = getDraftContext();
+            return draft ? { status: "draft", context: draft.slice(0, 4000) } : { status: "none", context: "" };
         }
-        if (!ctx.latestExplainer) return "";
-        return JSON.stringify(ctx.latestExplainer).slice(0, 4000);
+        if (ctx.latestExplainer) return { status: "generated", context: JSON.stringify(ctx.latestExplainer).slice(0, 4000) };
+        const draft = getDraftContext();
+        return draft ? { status: "draft", context: draft.slice(0, 4000) } : { status: "none", context: "" };
     };
 
     async function sendChat(message) {
         addMessage("user", message);
         addMessage("assistant", "Thinking...");
         try {
-            const context = getContext();
-            if (!context) {
+            const { status, context } = getContext();
+            if (status === "none") {
                 state.messages.pop();
-                addMessage("assistant", "Please generate an explanation or learning module first so I can help with product-specific follow-ups.");
+                addMessage("assistant", "Add a product name, URL, or specs first, then I can help you explain or study it.");
                 return;
             }
             const res = await fetch(`${API_BASE_URL}/api/chat`, {
@@ -69,6 +95,7 @@
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     mode: pageMode,
+                    contextStatus: status,
                     productName: pageMode === "learn" ? document.getElementById("learn-product-name")?.value || "" : document.getElementById("single-product-name")?.value || "",
                     productContext: context,
                     messages: state.messages.slice(-8)

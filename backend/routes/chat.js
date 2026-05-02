@@ -4,13 +4,14 @@ const openai = require("../services/openai");
 
 router.post("/", async (req, res) => {
     try {
-        const { mode = "explainer", productName = "", productContext = "", messages = [] } = req.body || {};
+        const { mode = "explainer", contextStatus = "none", productName = "", productContext = "", messages = [] } = req.body || {};
         const trimmedMessages = Array.isArray(messages) ? messages.slice(-8) : [];
         const formattedMessages = trimmedMessages.map(m => `${m.role === "assistant" ? "Assistant" : "User"}: ${m.content || ""}`).join("\n");
 
         const prompt = `
 You are Gearbox Coach, a concise retail product expert.
 Mode: ${mode}
+Context status: ${contextStatus}
 Product name: ${productName || "Unknown"}
 Context:
 ${productContext || "No product context available yet."}
@@ -22,6 +23,7 @@ Rules:
 - Be concise and practical for retail employees.
 - Do not invent unsupported product claims.
 - If context is missing, say what is missing and give a safe general answer.
+- If context status is "draft", mention this is guidance from typed details and recommend generating a full module/explanation for higher confidence.
 - Return plain text only.
 `;
 
