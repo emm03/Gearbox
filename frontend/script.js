@@ -185,6 +185,10 @@ function initExplainerMode() {
         card.addEventListener("click", () => setGoal(card.dataset.goal));
     });
 
+    document.querySelectorAll("[data-sample]").forEach(btn => {
+        btn.addEventListener("click", () => applyExplainerSample(btn.dataset.sample || "bike"));
+    });
+
     modeButtons.forEach((btn) => {
         btn.addEventListener("click", () => {
             setMode(btn.dataset.mode);
@@ -265,6 +269,39 @@ function initExplainerMode() {
         singleStoreSelect.addEventListener("change", syncOtherStoreInput);
         syncOtherStoreInput();
     }
+}
+
+function applyExplainerSample(sample) {
+    const presets = {
+        bike: {
+            category: "Bike",
+            name: "Co-op Cycles CTY 1.1",
+            link: "https://www.rei.com/product/197842/co-op-cycles-cty-11-bike",
+            specs: "Aluminum frame, 700c wheels, mechanical disc brakes, 2x8 drivetrain, commuter geometry.",
+            context: "Commuting 6 miles daily, beginner rider."
+        },
+        shoe: {
+            category: "Shoes",
+            name: "Salomon Sense Ride 5",
+            link: "https://www.rei.com/product/231917/salomon-sense-ride-5-trail-running-shoes",
+            specs: "Trail running shoe, moderate cushioning, all-terrain outsole, quicklace system.",
+            context: "New trail runner on mixed dirt and gravel paths."
+        },
+        jacket: {
+            category: "Jacket",
+            name: "Patagonia Nano Puff Hoody",
+            link: "https://www.patagonia.com/product/mens-nano-puff-hoody/84222.html",
+            specs: "Synthetic insulation, lightweight shell, wind-resistant, packable design.",
+            context: "Everyday cold weather layering and travel."
+        }
+    };
+    const p = presets[sample] || presets.bike;
+    const setValue = (id, value) => { const el = document.getElementById(id); if (el) el.value = value; };
+    setValue("single-category", p.category);
+    setValue("single-product-name", p.name);
+    setValue("single-product-link", p.link);
+    setValue("single-product-specs", p.specs);
+    setValue("single-buyer-context", p.context);
 }
 
 async function handleSingleExplainClick(goal) {
@@ -746,6 +783,40 @@ function initLearnMode() {
     if (!btn) return;
 
     btn.addEventListener("click", handleGenerateLearning);
+    document.querySelectorAll("[data-learn-sample]").forEach(sampleBtn => {
+        sampleBtn.addEventListener("click", () => applyLearnSample(sampleBtn.dataset.learnSample || "bike"));
+    });
+}
+
+function applyLearnSample(sample) {
+    const presets = {
+        bike: {
+            store: "rei", department: "bikes", name: "Co-op Cycles CTY 1.1",
+            url: "https://www.rei.com/product/197842/co-op-cycles-cty-11-bike",
+            specs: "Aluminum commuter bike, 700c wheels, mechanical disc brakes, upright fit, 2x8 drivetrain.",
+            context: "Help new commuters understand comfort vs speed tradeoffs."
+        },
+        shoe: {
+            store: "rei", department: "footwear", name: "Salomon Sense Ride 5",
+            url: "https://www.rei.com/product/231917/salomon-sense-ride-5-trail-running-shoes",
+            specs: "Trail shoe with all-terrain outsole, balanced cushioning, secure upper and quicklace system.",
+            context: "Explain trail grip, comfort, and durability for beginners."
+        },
+        jacket: {
+            store: "generic", department: "camping", name: "Patagonia Nano Puff Hoody",
+            url: "https://www.patagonia.com/product/mens-nano-puff-hoody/84222.html",
+            specs: "Synthetic insulated jacket, wind-resistant shell, lightweight and packable.",
+            context: "Train staff to explain layering and warmth for everyday use."
+        }
+    };
+    const p = presets[sample] || presets.bike;
+    const setValue = (id, value) => { const el = document.getElementById(id); if (el) el.value = value; };
+    setValue("store-select", p.store);
+    setValue("department-select", p.department);
+    setValue("learn-product-name", p.name);
+    setValue("learn-product-url", p.url);
+    setValue("product-specs", p.specs);
+    setValue("employee-context", p.context);
 }
 
 async function handleGenerateLearning() {
