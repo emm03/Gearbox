@@ -8,9 +8,10 @@
 
     <link rel="stylesheet" href="css/home.css" />
     <link rel="stylesheet" href="css/explainer.css" />
+    <link rel="stylesheet" href="css/chatbot.css" />
 </head>
 
-<body>
+<body data-page-mode="explainer">
 
     <header class="nav">
         <div class="nav-inner">
@@ -47,6 +48,11 @@
                     <button class="goal-card" type="button" data-goal="Explain the specs" aria-pressed="false">Explain the specs</button>
                     <button class="goal-card" type="button" data-goal="Compare two products" aria-pressed="false">Compare two products</button>
                     <button class="goal-card" type="button" data-goal="What should I know before buying?" aria-pressed="false">What should I know before buying?</button>
+                </div>
+                <div class="sample-demo-row">
+                    <button class="chip" type="button" data-sample="bike">Try sample bike</button>
+                    <button class="chip" type="button" data-sample="shoe">Try sample trail shoe</button>
+                    <button class="chip" type="button" data-sample="jacket">Try sample jacket</button>
                 </div>
             </div>
 
@@ -178,6 +184,7 @@
                 <p class="empty-copy">The output focuses on buying guidance, tradeoffs, and next checks — not generic product facts.</p>
                 <div class="explainer-result-grid">
                     <article class="result-card"><h4>Quick verdict</h4><p>A concise first recommendation will appear here.</p></article>
+                    <article class="result-card featured-card"><h4>Decision Path</h4><p>Your final decision, why it was made, what to verify, and next action buttons will appear here.</p></article>
                     <article class="result-card"><h4>Who it’s for</h4><p>Clear buyer-fit guidance will appear here.</p></article>
                     <article class="result-card"><h4>Not ideal for</h4><p>Potential mismatch warnings will appear here.</p></article>
                     <article class="result-card"><h4>Specs that matter</h4><p>The most important specs to check will appear here.</p></article>
@@ -186,29 +193,13 @@
                 </div>
             </div>
 
-            <div class="followup-wrap">
-                <p class="followup-title">Follow-up suggestions</p>
-                <div class="followup-chips">
-                    <button class="chip" type="button">Explain this simpler</button>
-                    <button class="chip" type="button">Is this beginner friendly?</button>
-                    <button class="chip" type="button">What are the downsides?</button>
-                    <button class="chip" type="button">What should I ask an employee?</button>
-                    <button class="chip" type="button">Compare to a cheaper option</button>
-                </div>
-                <div class="followup-answer-panel hidden" id="followup-answer-panel">
-                    <div class="followup-answer-header">
-                        <h4 id="followup-question-title">Follow-up question</h4>
-                        <button class="clear-followup-btn" id="clear-followup-btn" type="button">Clear follow-up</button>
-                    </div>
-                    <p class="followup-response" id="followup-response"></p>
-                </div>
-            </div>
         </section>
 
     </main>
 
     <footer class="footer">© Gearbox</footer>
     <script src="script.js"></script>
+    <script src="chatbot.js"></script>
 </body>
 
 </html>
