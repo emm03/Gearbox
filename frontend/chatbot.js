@@ -39,8 +39,43 @@
     const form = shell.querySelector("#chatbot-form");
 
     const renderLog = () => {
-        log.innerHTML = state.messages.map(m => `<p class="chat-${m.role}">${m.content}</p>`).join("");
+        log.innerHTML = state.messages.map(m => `<div class="chat-${m.role}">${formatMessage(m.content)}</div>`).join("");
         log.scrollTop = log.scrollHeight;
+    };
+    const escapeHtml = (str = "") => String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+
+    const formatMessage = (raw = "") => {
+        const safe = escapeHtml(raw);
+        const lines = safe.split(/\r?\n/);
+        const html = [];
+        let inList = false;
+        lines.forEach((line) => {
+            const trimmed = line.trim();
+            if (!trimmed) {
+                if (inList) { html.push("</ul>"); inList = false; }
+                return;
+            }
+            const bulletMatch = trimmed.match(/^(-|•)\s+(.+)/);
+            if (bulletMatch) {
+                if (!inList) { html.push("<ul>"); inList = true; }
+                html.push(`<li>${bulletMatch[2]}</li>`);
+                return;
+            }
+            if (inList) { html.push("</ul>"); inList = false; }
+            const labelMatch = trimmed.match(/^\*\*(.+?)\*\*:\s*(.*)$/) || trimmed.match(/^([A-Za-z][A-Za-z\s]{2,40}):\s*(.*)$/);
+            if (labelMatch) {
+                html.push(`<p><strong>${labelMatch[1]}:</strong> ${labelMatch[2] || ""}</p>`);
+            } else {
+                html.push(`<p>${trimmed}</p>`);
+            }
+        });
+        if (inList) html.push("</ul>");
+        return html.join("");
     };
     const addMessage = (role, content) => { state.messages.push({ role, content }); renderLog(); };
 

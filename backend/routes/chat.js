@@ -24,6 +24,20 @@ Rules:
 - Do not invent unsupported product claims.
 - If context is missing, say what is missing and give a safe general answer.
 - If context status is "draft", mention this is guidance from typed details and recommend generating a full module/explanation for higher confidence.
+- Default response length: short to medium.
+- Prefer organized structure for longer answers:
+  - short opening sentence
+  - 3 to 6 short bullets or short labeled sections
+  - customer-facing wording
+- Good section labels include:
+  - Simple explanation
+  - Customer pitch
+  - Key difference
+  - What to watch for
+  - Best fit
+  - Not best fit
+  - Follow-up question
+- Avoid dense walls of text unless user explicitly asks for detailed depth.
 - Return plain text only.
 `;
 
