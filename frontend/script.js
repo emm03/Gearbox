@@ -188,6 +188,7 @@ function initExplainerMode() {
     document.querySelectorAll("[data-sample]").forEach(btn => {
         btn.addEventListener("click", () => applyExplainerSample(btn.dataset.sample || "bike"));
     });
+    document.getElementById("explainer-lookup-btn")?.addEventListener("click", runExplainerLookup);
 
     modeButtons.forEach((btn) => {
         btn.addEventListener("click", () => {
@@ -268,6 +269,28 @@ function initExplainerMode() {
         };
         singleStoreSelect.addEventListener("change", syncOtherStoreInput);
         syncOtherStoreInput();
+    }
+}
+
+async function runExplainerLookup() {
+    const productName = document.getElementById("single-product-name")?.value.trim() || "";
+    const productUrl = document.getElementById("single-product-link")?.value.trim() || "";
+    const store = document.getElementById("single-store")?.value || "";
+    const department = document.getElementById("single-category")?.value || "";
+    const panel = document.getElementById("explainer-lookup-preview");
+    if (!panel) return;
+    panel.classList.remove("hidden");
+    panel.innerHTML = `<p>Looking up product details...</p>`;
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/product-lookup`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ productName, productUrl, store, department })
+        });
+        const data = await res.json();
+        renderLookupPreview(panel, data, "single-product-specs");
+    } catch {
+        panel.innerHTML = `<p>Lookup failed. Paste specs manually for best accuracy.</p>`;
     }
 }
 
@@ -537,6 +560,49 @@ function renderDecisionPath(data) {
             </div>
         </article>
     `;
+    panel.classList.remove("hidden");
+}
+
+async function applyRefinementFocus(focus) {
+    const buyerContextEl = document.getElementById("single-buyer-context");
+    if (!buyerContextEl) return;
+
+    const notes = {
+        comfort: "Priority: Comfort matters most.",
+        budget: "Priority: Budget matters most.",
+        performance: "Priority: Performance matters most."
+    };
+    const note = notes[focus];
+    if (!note) return;
+
+    if (!buyerContextEl.value.includes(note)) {
+        buyerContextEl.value = [buyerContextEl.value.trim(), note].filter(Boolean).join("\n");
+    }
+
+    const panel = document.getElementById("decision-inline-panel");
+    if (panel) {
+        panel.innerHTML += `<p class="decision-inline-note">Refreshing guidance with your new priority: ${escapeHtml(note)}</p>`;
+    }
+
+    await handleSingleExplainClick("Is this right for me?");
+}
+
+function getCategoryLearningBullets(category) {
+    if (category === "Bike") {
+        return ["Fit and frame size", "Brake type", "Tire width", "Gearing range", "Intended terrain"];
+    }
+    return ["Fit for your use case", "Comfort over long sessions", "Durability and maintenance", "Core performance specs", "Total ownership cost"];
+}
+
+function inferDecisionLabel(quickVerdict, recommendation) {
+    const joined = `${quickVerdict || ""} ${recommendation || ""}`.toLowerCase();
+    if (/(not recommended|avoid|skip|poor fit|don'?t buy|bad fit)/.test(joined)) {
+        return { key: "not-recommended", label: "Not recommended" };
+    }
+    if (/(good fit|strong fit|recommended|buy|worth it|great option)/.test(joined)) {
+        return { key: "good-fit", label: "Good fit" };
+    }
+    return { key: "maybe", label: "Maybe" };
 }
 
 function renderDecisionInlinePanel(mode) {
@@ -786,6 +852,58 @@ function initLearnMode() {
     document.querySelectorAll("[data-learn-sample]").forEach(sampleBtn => {
         sampleBtn.addEventListener("click", () => applyLearnSample(sampleBtn.dataset.learnSample || "bike"));
     });
+    document.getElementById("learn-lookup-btn")?.addEventListener("click", runLearnLookup);
+}
+
+async function runLearnLookup() {
+    const productName = document.getElementById("learn-product-name")?.value.trim() || "";
+    const productUrl = document.getElementById("learn-product-url")?.value.trim() || "";
+    const store = document.getElementById("store-select")?.value || "";
+    const department = document.getElementById("department-select")?.value || "";
+    const panel = document.getElementById("learn-lookup-preview");
+    if (!panel) return;
+    panel.classList.remove("hidden");
+    panel.innerHTML = `<p>Looking up product details...</p>`;
+    try {
+        const res = await fetch(`${API_BASE_URL}/api/product-lookup`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ productName, productUrl, store, department })
+        });
+        const data = await res.json();
+        renderLookupPreview(panel, data, "product-specs");
+    } catch {
+        panel.innerHTML = `<p>Lookup failed. Paste specs manually for best accuracy.</p>`;
+    }
+}
+
+function renderLookupPreview(panel, data, targetFieldId) {
+    const warnings = Array.isArray(data.warnings) ? data.warnings : [];
+    const specsText = Array.isArray(data.specs) ? data.specs.join("\n") : "";
+    panel.innerHTML = `
+        <p><strong>Gearbox found possible product info. Review before generating.</strong></p>
+        <p><strong>Product:</strong> ${escapeHtml(data.productName || "unknown")}</p>
+        <p><strong>Brand:</strong> ${escapeHtml(data.brand || "unknown")} · <strong>Category:</strong> ${escapeHtml(data.category || "unknown")}</p>
+        <p>${escapeHtml(data.description || "No description found.")}</p>
+        ${warnings.length ? `<p>${escapeHtml(warnings.join(" "))}</p>` : ""}
+        <div class="lookup-actions">
+            <button type="button" class="decision-btn primary" data-lookup-use="${targetFieldId}">Use these specs</button>
+            <button type="button" class="decision-btn" data-lookup-clear="1">Clear</button>
+        </div>
+    `;
+    panel.dataset.lookupSpecs = specsText;
+    panel.addEventListener("click", (e) => {
+        const useBtn = e.target.closest("[data-lookup-use]");
+        const clearBtn = e.target.closest("[data-lookup-clear]");
+        if (useBtn) {
+            const target = document.getElementById(useBtn.dataset.lookupUse);
+            if (target) target.value = panel.dataset.lookupSpecs || "";
+        }
+        if (clearBtn) {
+            panel.classList.add("hidden");
+            panel.innerHTML = "";
+        }
+    }, { once: true });
 }
 
 function applyLearnSample(sample) {

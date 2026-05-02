@@ -514,6 +514,26 @@
     cursor: pointer;
 }
 
+.lookup-preview {
+    margin-top: 0.55rem;
+    border: 1px solid rgba(127, 161, 255, 0.25);
+    border-radius: 10px;
+    background: rgba(6, 12, 26, 0.72);
+    padding: 0.65rem;
+    color: #dbe7ff;
+}
+
+.lookup-preview.hidden {
+    display: none;
+}
+
+.lookup-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    margin-top: 0.45rem;
+}
+
 @media (max-width: 1060px) {
     .goal-card-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));

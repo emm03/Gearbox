@@ -87,6 +87,9 @@ body {
 .learn-form label { display:block; margin: 0.65rem 0 0.35rem; font-weight: 600; }
 .sample-demo-row { display:flex; flex-wrap:wrap; gap:0.45rem; margin-bottom:0.55rem; }
 .sample-demo-row .chip { border:1px solid rgba(127,161,255,.3); background:rgba(127,161,255,.12); color:#d8e4ff; border-radius:999px; padding:.35rem .65rem; cursor:pointer; font-size:.8rem; }
+.lookup-preview { margin-top:.55rem; border:1px solid rgba(127,161,255,.24); border-radius:10px; background:rgba(9,16,34,.7); padding:.65rem; color:#cfdcff; }
+.lookup-preview.hidden { display:none; }
+.lookup-actions { display:flex; gap:.45rem; margin-top:.45rem; flex-wrap:wrap; }
 .learn-form select, .learn-form textarea, .learn-form input {
     width:100%; max-width:100%; min-width:0; border-radius: 10px; border:1px solid rgba(127,161,255,.34);
     background: rgba(7, 14, 31, 0.75); color:#e6ecff; padding: 0.7rem;

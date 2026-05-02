@@ -9,6 +9,7 @@ const cors = require("cors");
 const explainerRoutes = require("./routes/explainer");
 const learnRoutes = require("./routes/learn"); // ✅ NEW
 const chatRoutes = require("./routes/chat");
+const productLookupRoutes = require("./routes/productLookup");
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use("/api", explainerRoutes);
 // Learn Mode
 app.use("/api/learn", learnRoutes); // ✅ NEW
 app.use("/api/chat", chatRoutes);
+app.use("/api/product-lookup", productLookupRoutes);
 
 /* ------------------ Server ------------------ */
 
