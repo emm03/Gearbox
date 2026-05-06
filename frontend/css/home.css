@@ -353,3 +353,81 @@ main {
     font-size: 0.98rem;
   }
 }
+
+
+.hero-copy h1 .headline-accent {
+  background: linear-gradient(90deg, #dfe9ff 0%, #95b8ff 42%, #85e3d4 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 0 rgba(145, 205, 255, 0.3);
+  transition: text-shadow 180ms ease, filter 180ms ease;
+}
+
+.hero-copy h1:hover .headline-accent {
+  text-shadow: 0 0 18px rgba(118, 206, 196, 0.28);
+  filter: brightness(1.05);
+}
+
+.hero { padding: 78px 0 40px; }
+.section { padding: 62px 0; }
+.section.compact { padding-top: 26px; padding-bottom: 34px; }
+.section.final { padding-top: 52px; padding-bottom: 70px; }
+
+.card {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.card:hover,
+.hero-demo:hover,
+.lookup-callout:hover {
+  transform: translateY(-4px);
+  border-color: rgba(134, 217, 202, 0.48);
+  box-shadow: 0 16px 30px rgba(6, 12, 28, 0.42);
+  background: linear-gradient(180deg, rgba(21, 37, 72, 0.98), rgba(14, 27, 52, 0.98));
+}
+
+.hero-demo,
+.lookup-callout {
+  transition: transform 180ms ease, border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.feature .feature-link {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-weight: 700;
+  text-decoration: none;
+  color: #8bded0;
+}
+
+.feature .feature-link span {
+  transition: transform 160ms ease;
+}
+
+.feature .feature-link:hover {
+  color: #b6efe5;
+}
+
+.feature .feature-link:hover span {
+  transform: translateX(3px);
+}
+
+.step-num {
+  background: linear-gradient(180deg, rgba(79, 124, 255, 0.28), rgba(93, 195, 181, 0.18));
+  border: 1px solid rgba(141, 218, 203, 0.42);
+}
+
+.trust-row > div:hover {
+  border-color: rgba(141, 218, 203, 0.46);
+  background: rgba(109, 211, 194, 0.13);
+}
+
+@media (max-width: 1000px) {
+  .hero { padding-top: 56px; padding-bottom: 24px; }
+  .section { padding: 52px 0; }
+}
