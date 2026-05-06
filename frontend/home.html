@@ -1,132 +1,147 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <meta charset="UTF-8" />
-    <title>Gearbox</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="css/home.css" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gearbox</title>
+  <link rel="stylesheet" href="css/home.css" />
 </head>
-
 <body>
-    <header class="nav">
-        <div class="nav-inner">
-            <div class="logo">GEARBOX</div>
-            <nav class="nav-links">
-                <a href="home.html" class="active">Home</a>
-                <a href="explainer.html">Explainer</a>
-                <a href="learn.html">Learn</a>
-            </nav>
+  <header class="nav">
+    <div class="container nav-inner">
+      <div class="logo">GEARBOX</div>
+      <nav class="nav-links">
+        <a href="home.html" class="active">Home</a>
+        <a href="explainer.html">Explainer</a>
+        <a href="learn.html">Learn</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="container hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">AI PRODUCT LEARNING FOR RETAIL TEAMS</p>
+          <h1>Learn products faster. Explain them better.</h1>
+          <p class="subtitle">Gearbox turns product specs, links, and messy customer questions into clear explanations, flashcards, practice questions, and retail-ready answers.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="explainer.html">Try Product Explainer</a>
+            <a class="btn btn-secondary" href="learn.html">Open Learn Mode</a>
+          </div>
         </div>
-    </header>
 
-    <main>
-        <section class="hero-section">
-            <div class="hero-layout">
-                <div class="hero-content">
-                    <h1 class="hero-title">
-                        <span class="hero-line">Gear is confusing.</span>
-                        <span class="hero-line accent">Gearbox makes it clear.</span>
-                    </h1>
-                    <p class="hero-lead">Gearbox helps retail employees learn products faster and explain them clearly to customers.</p>
-                    <div class="hero-actions">
-                        <a href="explainer.html" class="primary-btn">Try Product Explainer</a>
-                        <a href="learn.html" class="secondary-btn">Open Learn Mode</a>
-                    </div>
-                </div>
-                <aside class="example-card">
-                    <div class="example-label">Mini workflow preview</div>
-                    <ol class="mini-flow">
-                        <li><strong>Input specs</strong><span>Paste product details or a URL.</span></li>
-                        <li><strong>Generate explanation</strong><span>Get customer-friendly guidance.</span></li>
-                        <li><strong>Study or ask Coach</strong><span>Use flashcards, practice, and follow-up chat.</span></li>
-                    </ol>
-                    <p class="example-text" id="exampleText"></p>
-                </aside>
-            </div>
-        </section>
+        <aside class="hero-demo" aria-label="Gearbox mini workflow preview">
+          <p class="demo-title">Demo preview</p>
+          <div class="demo-step"><span>Input</span><p>Paste product specs or a URL</p></div>
+          <div class="demo-step"><span>Clarity</span><p>Generate plain-language explanation</p></div>
+          <div class="demo-step"><span>Study</span><p>Flashcards, practice, and quiz</p></div>
+          <div class="demo-step"><span>Coach</span><p>Ask follow-up questions instantly</p></div>
+        </aside>
+      </div>
+      <div class="container trust-row">
+        <div>Built for retail teams</div>
+        <div>Turns specs into plain language</div>
+        <div>Creates study tools instantly</div>
+      </div>
+    </section>
 
-        <section class="section-block">
-            <div class="container">
-                <div class="section-head reveal">
-                    <h2>Main features</h2>
-                    <p>Three connected tools for product clarity on the sales floor.</p>
-                </div>
-                <div class="feature-grid">
-                    <article class="feature-card reveal">
-                        <h3>Product Explainer</h3>
-                        <p><strong>What it does:</strong> Turns specs into plain-language buying guidance.</p>
-                        <p><strong>Why it helps:</strong> Employees explain tradeoffs clearly to customers.</p>
-                        <a href="explainer.html" class="primary-btn">Open Explainer</a>
-                    </article>
-                    <article class="feature-card reveal">
-                        <h3>Learn Mode</h3>
-                        <p><strong>What it does:</strong> Builds flashcards, practice questions, and quizzes.</p>
-                        <p><strong>Why it helps:</strong> Staff retain product knowledge faster.</p>
-                        <a href="learn.html" class="primary-btn">Open Learn Mode</a>
-                    </article>
-                    <article class="feature-card reveal">
-                        <h3>Gearbox Coach</h3>
-                        <p><strong>What it does:</strong> Answers follow-up questions in context.</p>
-                        <p><strong>Why it helps:</strong> Gives fast help with pitches, objections, and comparisons.</p>
-                        <a href="learn.html" class="primary-btn">Ask via Learn</a>
-                    </article>
-                </div>
-            </div>
-        </section>
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <h2>Main features</h2>
+        </div>
+        <div class="cards three-up">
+          <article class="card feature">
+            <p class="icon-dot">●</p>
+            <h3>Product Explainer</h3>
+            <p>Translate product details into customer-friendly buying guidance.</p>
+            <ul>
+              <li>Plain-language product breakdowns</li>
+              <li>Tradeoff-focused recommendations</li>
+              <li>Built for real customer questions</li>
+            </ul>
+            <a class="btn btn-primary" href="explainer.html">Open Explainer</a>
+          </article>
 
-        <section class="section-block">
-            <div class="container">
-                <div class="section-head reveal">
-                    <h2>How it works</h2>
-                </div>
-                <div class="steps-grid">
-                    <article class="step-card reveal"><span>1</span><h4>Add product info</h4><p>Paste specs or a product link.</p></article>
-                    <article class="step-card reveal"><span>2</span><h4>Generate guidance</h4><p>Create customer explanation or training module.</p></article>
-                    <article class="step-card reveal"><span>3</span><h4>Study and practice</h4><p>Use flashcards, practice mode, and quiz.</p></article>
-                    <article class="step-card reveal"><span>4</span><h4>Ask Gearbox Coach</h4><p>Get follow-up help for real customer questions.</p></article>
-                </div>
-            </div>
-        </section>
+          <article class="card feature">
+            <p class="icon-dot">●</p>
+            <h3>Learn Mode</h3>
+            <p>Generate product training modules your team can actually use.</p>
+            <ul>
+              <li>Flashcards for fast retention</li>
+              <li>Practice and quiz modes</li>
+              <li>Free and pro-size modules</li>
+            </ul>
+            <a class="btn btn-primary" href="learn.html">Open Learn Mode</a>
+          </article>
 
-        <section class="section-block compact">
-            <div class="container">
-                <article class="lookup-note reveal">
-                    <h3>Smart Lookup beta</h3>
-                    <p>Don’t have specs? Gearbox can try to pull product details from a URL, then lets you review before generating.</p>
-                </article>
-            </div>
-        </section>
+          <article class="card feature">
+            <p class="icon-dot">●</p>
+            <h3>Gearbox Coach</h3>
+            <p>Ask context-aware follow-up questions while you train or explain.</p>
+            <ul>
+              <li>Beginner-friendly wording help</li>
+              <li>Objection handling support</li>
+              <li>Quick pitch and comparison guidance</li>
+            </ul>
+            <a class="btn btn-primary" href="learn.html">Ask in Learn Mode</a>
+          </article>
+        </div>
+      </div>
+    </section>
 
-        <section class="section-block">
-            <div class="container">
-                <div class="section-head reveal">
-                    <h2>Why Gearbox works</h2>
-                </div>
-                <div class="value-grid">
-                    <div class="value-card reveal"><h3>Real conversations first</h3><p>Built for questions employees hear every day.</p></div>
-                    <div class="value-card reveal"><h3>AI that supports people</h3><p>Improves confidence without replacing human judgment.</p></div>
-                    <div class="value-card reveal"><h3>Built to evolve</h3><p>Scales across products, categories, and training needs.</p></div>
-                </div>
-            </div>
-        </section>
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <h2>How it works</h2>
+        </div>
+        <div class="cards four-up">
+          <article class="card step"><span class="step-num">1</span><h4>Add product info</h4><p>Paste specs, a product link, or a product name.</p></article>
+          <article class="card step"><span class="step-num">2</span><h4>Generate clarity</h4><p>Get plain-language explanations or a training module.</p></article>
+          <article class="card step"><span class="step-num">3</span><h4>Study the product</h4><p>Use flashcards, practice mode, and quiz mode.</p></article>
+          <article class="card step"><span class="step-num">4</span><h4>Ask follow ups</h4><p>Use Gearbox Coach for objections, comparisons, and beginner explanations.</p></article>
+        </div>
+      </div>
+    </section>
 
-        <section class="section-block final-cta">
-            <div class="container reveal">
-                <div class="cta-panel">
-                    <h2>Start with a product</h2>
-                    <p>Try Gearbox with a product link, pasted specs, or a sample workflow.</p>
-                    <div class="hero-actions">
-                        <a href="explainer.html" class="primary-btn">Try Product Explainer</a>
-                        <a href="learn.html" class="secondary-btn">Open Learn Mode</a>
-                    </div>
-                </div>
-            </div>
-        </section>
-    </main>
+    <section class="section compact">
+      <div class="container">
+        <article class="lookup-callout">
+          <h3>Don’t have specs?</h3>
+          <p>Smart Lookup beta can try to pull product details from a URL, then lets you review before generating.</p>
+        </article>
+      </div>
+    </section>
 
-    <footer class="footer">© Gearbox</footer>
-    <script src="script.js"></script>
+    <section class="section">
+      <div class="container">
+        <div class="section-head">
+          <h2>Why Gearbox</h2>
+        </div>
+        <div class="cards three-up">
+          <article class="card"><h3>Real product understanding</h3><p>Helps employees understand what matters instead of memorizing specs.</p></article>
+          <article class="card"><h3>Better customer conversations</h3><p>Turns complex details into clear answers customers trust.</p></article>
+          <article class="card"><h3>Built to grow with teams</h3><p>Scales across categories, stores, and training workflows.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section final">
+      <div class="container">
+        <article class="cta-panel">
+          <h2>Ready to try it with a product?</h2>
+          <p>Use Gearbox with pasted specs, product links, or sample workflows.</p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="explainer.html">Try Product Explainer</a>
+            <a class="btn btn-secondary" href="learn.html">Open Learn Mode</a>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">© Gearbox</footer>
+  <script src="script.js"></script>
 </body>
-
 </html>
