@@ -23,7 +23,7 @@
       <div class="container hero-grid">
         <div class="hero-copy">
           <p class="eyebrow">AI PRODUCT LEARNING FOR RETAIL TEAMS</p>
-          <h1>Turn <span class="headline-glow">product specs</span> into <span class="headline-accent">confident</span> <span class="headline-glow">customer conversations.</span></h1>
+          <h1 class="hero-title" id="heroTitle">Turn <span class="headline-glow">product specs</span> into <span class="headline-accent">confident</span> <span class="headline-glow">customer conversations.</span></h1>
           <p class="subtitle">Gearbox helps retail employees explain products clearly, practice with flashcards and quizzes, and answer customer follow ups with confidence.</p>
           <div class="hero-actions">
             <a class="btn btn-primary" href="explainer.html">Try Product Explainer</a>
@@ -169,13 +169,43 @@
   <script>
   (() => {
     const items = Array.from(document.querySelectorAll('.preview-item'));
-    if (!items.length) return;
-    let index = 0;
-    setInterval(() => {
-      items[index].classList.remove('active');
-      index = (index + 1) % items.length;
-      items[index].classList.add('active');
-    }, 3200);
+    if (items.length) {
+      let index = 0;
+      setInterval(() => {
+        items[index].classList.remove('active');
+        index = (index + 1) % items.length;
+        items[index].classList.add('active');
+      }, 3200);
+    }
+
+    const title = document.getElementById('heroTitle');
+    if (!title || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const words = [...title.childNodes].flatMap((n) => {
+      if (n.nodeType === Node.TEXT_NODE) {
+        return n.textContent.split(/(\s+)/).map((t) => t.trim() ? `<span class="title-word">${t}</span>` : t).join('');
+      }
+      return n.outerHTML;
+    }).join('');
+    title.innerHTML = words;
+
+    title.addEventListener('pointermove', (e) => {
+      const spans = title.querySelectorAll('.title-word,.headline-glow,.headline-accent');
+      spans.forEach((el) => {
+        const r = el.getBoundingClientRect();
+        const cx = r.left + r.width / 2;
+        const cy = r.top + r.height / 2;
+        const d = Math.hypot(e.clientX - cx, e.clientY - cy);
+        const t = Math.max(0, 1 - d / 120);
+        el.style.setProperty('--lift', (t * 4).toFixed(2) + 'px');
+        el.style.setProperty('--glow', (0.15 + t * 0.55).toFixed(2));
+      });
+    });
+    title.addEventListener('pointerleave', () => {
+      title.querySelectorAll('.title-word,.headline-glow,.headline-accent').forEach((el) => {
+        el.style.removeProperty('--lift');
+        el.style.removeProperty('--glow');
+      });
+    });
   })();
 </script>
   <script src="script.js"></script>
