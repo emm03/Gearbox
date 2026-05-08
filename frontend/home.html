@@ -23,7 +23,7 @@
       <div class="container hero-grid">
         <div class="hero-copy">
           <p class="eyebrow">AI PRODUCT LEARNING FOR RETAIL TEAMS</p>
-          <h1>Turn product specs into <span class="headline-accent">confident customer conversations.</span></h1>
+          <h1>Turn <span class="headline-glow">product specs</span> into <span class="headline-accent">confident</span> <span class="headline-glow">customer conversations.</span></h1>
           <p class="subtitle">Gearbox helps retail employees explain products clearly, practice with flashcards and quizzes, and answer customer follow ups with confidence.</p>
           <div class="hero-actions">
             <a class="btn btn-primary" href="explainer.html">Try Product Explainer</a>
@@ -32,17 +32,49 @@
         </div>
 
         <aside class="hero-workflow" aria-label="Gearbox workflow preview">
-          <p class="workflow-title">Specs → Clarity preview</p>
-          <div class="workflow-lane">
-            <article class="pane pane-input">
-              <h3>Input</h3>
-              <p class="pane-kicker">Trail running shoe</p>
-              <p>“6mm drop • lug outsole • waterproof upper • reinforced toe”</p>
+          <p class="workflow-title">Specs → Clarity Preview</p>
+          <div class="preview-stack" id="previewStack">
+            <article class="preview-item active" data-product="Trail running shoe">
+              <div class="workflow-lane">
+                <article class="pane pane-input">
+                  <h3>Input</h3>
+                  <p class="pane-kicker">Trail running shoe</p>
+                  <p>“6mm drop • lug outsole • waterproof upper • reinforced toe”</p>
+                </article>
+                <div class="lane-arrow" aria-hidden="true">→</div>
+                <article class="pane pane-output">
+                  <h3>Customer-ready explanation</h3>
+                  <p>“Grippy, stable trail shoe with weather protection and all-day comfort.”</p>
+                </article>
+              </div>
             </article>
-            <div class="lane-arrow" aria-hidden="true">→</div>
-            <article class="pane pane-output">
-              <h3>Customer-ready explanation</h3>
-              <p>“Grippy, stable trail shoe with weather protection and all-day comfort.”</p>
+            <article class="preview-item" data-product="Rain jacket">
+              <div class="workflow-lane">
+                <article class="pane pane-input">
+                  <h3>Input</h3>
+                  <p class="pane-kicker">Rain jacket</p>
+                  <p>“3-layer shell • 20k waterproof • pit zips • taped seams”</p>
+                </article>
+                <div class="lane-arrow" aria-hidden="true">→</div>
+                <article class="pane pane-output">
+                  <h3>Customer-ready explanation</h3>
+                  <p>“Storm-ready shell that blocks rain while venting heat on active hikes.”</p>
+                </article>
+              </div>
+            </article>
+            <article class="preview-item" data-product="Bike">
+              <div class="workflow-lane">
+                <article class="pane pane-input">
+                  <h3>Input</h3>
+                  <p class="pane-kicker">Bike</p>
+                  <p>“Aluminum frame • 1x drivetrain • hydraulic disc brakes • tubeless ready”</p>
+                </article>
+                <div class="lane-arrow" aria-hidden="true">→</div>
+                <article class="pane pane-output">
+                  <h3>Customer-ready explanation</h3>
+                  <p>“Light and responsive bike with confident braking and lower maintenance setup.”</p>
+                </article>
+              </div>
             </article>
           </div>
           <div class="study-chip-row">
@@ -134,6 +166,18 @@
   </main>
 
   <footer class="footer">© Gearbox</footer>
+  <script>
+  (() => {
+    const items = Array.from(document.querySelectorAll('.preview-item'));
+    if (!items.length) return;
+    let index = 0;
+    setInterval(() => {
+      items[index].classList.remove('active');
+      index = (index + 1) % items.length;
+      items[index].classList.add('active');
+    }, 3200);
+  })();
+</script>
   <script src="script.js"></script>
 </body>
 </html>
