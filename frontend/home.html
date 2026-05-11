@@ -179,31 +179,39 @@
     }
 
     const title = document.getElementById('heroTitle');
-    if (!title || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const words = [...title.childNodes].flatMap((n) => {
-      if (n.nodeType === Node.TEXT_NODE) {
-        return n.textContent.split(/(\s+)/).map((t) => t.trim() ? `<span class="title-word">${t}</span>` : t).join('');
-      }
-      return n.outerHTML;
-    }).join('');
-    title.innerHTML = words;
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!title || reduced) return;
 
+    const tokenize = (txt) => txt.split(/(\s+)/).map((token) => {
+      if (!token.trim()) return token;
+      return `<span class="title-word">${[...token].map((ch) => `<span class="title-char">${ch}</span>`).join('')}</span>`;
+    }).join('');
+
+    const html = [...title.childNodes].map((n) => {
+      if (n.nodeType === Node.TEXT_NODE) return tokenize(n.textContent);
+      const cls = n.className || '';
+      return `<span class="${cls} title-word">${[...n.textContent].map((ch) => `<span class="title-char">${ch}</span>`).join('')}</span>`;
+    }).join('');
+    title.innerHTML = html;
+
+    const chars = Array.from(title.querySelectorAll('.title-char'));
     title.addEventListener('pointermove', (e) => {
-      const spans = title.querySelectorAll('.title-word,.headline-glow,.headline-accent');
-      spans.forEach((el) => {
+      chars.forEach((el) => {
         const r = el.getBoundingClientRect();
         const cx = r.left + r.width / 2;
         const cy = r.top + r.height / 2;
         const d = Math.hypot(e.clientX - cx, e.clientY - cy);
-        const t = Math.max(0, 1 - d / 120);
-        el.style.setProperty('--lift', (t * 4).toFixed(2) + 'px');
-        el.style.setProperty('--glow', (0.15 + t * 0.55).toFixed(2));
+        const t = Math.max(0, 1 - d / 90);
+        el.style.setProperty('--char-scale', (1 + t * 0.14).toFixed(3));
+        el.style.setProperty('--char-lift', (t * 2.4).toFixed(2) + 'px');
+        el.style.setProperty('--char-glow', (0.18 + t * 0.72).toFixed(2));
       });
     });
     title.addEventListener('pointerleave', () => {
-      title.querySelectorAll('.title-word,.headline-glow,.headline-accent').forEach((el) => {
-        el.style.removeProperty('--lift');
-        el.style.removeProperty('--glow');
+      chars.forEach((el) => {
+        el.style.removeProperty('--char-scale');
+        el.style.removeProperty('--char-lift');
+        el.style.removeProperty('--char-glow');
       });
     });
   })();
