@@ -20,146 +20,197 @@
 
   <main>
     <section class="hero">
-      <div class="container hero-grid">
+      <div class="hero-orb hero-orb-a" aria-hidden="true"></div>
+      <div class="hero-orb hero-orb-b" aria-hidden="true"></div>
+      <div class="container hero-grid reveal">
         <div class="hero-copy">
           <p class="eyebrow">AI PRODUCT LEARNING FOR RETAIL TEAMS</p>
-          <h1 class="hero-title" id="heroTitle">Turn <span class="headline-glow">product specs</span> into <span class="headline-accent">confident</span> <span class="headline-glow">customer conversations.</span></h1>
-          <p class="subtitle">Gearbox helps retail employees explain products clearly, practice with flashcards and quizzes, and answer customer follow ups with confidence.</p>
+          <h1 class="hero-title" id="heroTitle">
+            <span class="hero-title-word">Turn product specs</span><br>
+            <span class="hero-title-word headline-accent">into confident</span><br>
+            <span class="hero-title-word">customer conversations.</span>
+          </h1>
+          <p class="subtitle">Gearbox helps retail employees explain complex products clearly, train faster, and handle customer follow-up questions with confidence.</p>
           <div class="hero-actions">
             <a class="btn btn-primary" href="explainer.html">Try Product Explainer</a>
-            <a class="btn btn-secondary" href="learn.html">Open Learn Mode</a>
+            <a class="text-action" href="learn.html">Preview Learn Mode →</a>
+          </div>
+          <div class="micro-proof">
+            <span>Built for fast floor conversations</span>
+            <span>Spec clarity in seconds</span>
+            <span>Practice built in</span>
           </div>
         </div>
 
         <aside class="hero-workflow" aria-label="Gearbox workflow preview">
-          <p class="workflow-title">Specs → Clarity Preview</p>
+          <div class="workflow-head">
+            <p class="workflow-title">Specs → Clarity Preview</p>
+            <p class="workflow-step" id="workflowStep">Bike</p>
+          </div>
           <div class="preview-stack" id="previewStack">
-            <article class="preview-item active" data-product="Trail running shoe">
+            <article class="preview-item active" data-product="Bike">
               <div class="workflow-lane">
                 <article class="pane pane-input">
-                  <h3>Input</h3>
-                  <p class="pane-kicker">Trail running shoe</p>
-                  <p>“6mm drop • lug outsole • waterproof upper • reinforced toe”</p>
-                </article>
-                <div class="lane-arrow" aria-hidden="true">→</div>
-                <article class="pane pane-output">
-                  <h3>Customer-ready explanation</h3>
-                  <p>“Grippy, stable trail shoe with weather protection and all-day comfort.”</p>
-                </article>
-              </div>
-            </article>
-            <article class="preview-item" data-product="Rain jacket">
-              <div class="workflow-lane">
-                <article class="pane pane-input">
-                  <h3>Input</h3>
-                  <p class="pane-kicker">Rain jacket</p>
-                  <p>“3-layer shell • 20k waterproof • pit zips • taped seams”</p>
-                </article>
-                <div class="lane-arrow" aria-hidden="true">→</div>
-                <article class="pane pane-output">
-                  <h3>Customer-ready explanation</h3>
-                  <p>“Storm-ready shell that blocks rain while venting heat on active hikes.”</p>
-                </article>
-              </div>
-            </article>
-            <article class="preview-item" data-product="Bike">
-              <div class="workflow-lane">
-                <article class="pane pane-input">
-                  <h3>Input</h3>
+                  <h3>Input specs</h3>
                   <p class="pane-kicker">Bike</p>
                   <p>“Aluminum frame • 1x drivetrain • hydraulic disc brakes • tubeless ready”</p>
                 </article>
-                <div class="lane-arrow" aria-hidden="true">→</div>
                 <article class="pane pane-output">
                   <h3>Customer-ready explanation</h3>
-                  <p>“Light and responsive bike with confident braking and lower maintenance setup.”</p>
+                  <p>“Light, responsive bike with powerful braking and a setup that needs less maintenance.”</p>
                 </article>
+              </div>
+              <div class="preview-footer">
+                <div>
+                  <h4>Study tools generated</h4>
+                  <p>Flashcards + Practice drill + Quick quiz</p>
+                </div>
+                <div>
+                  <h4>Coach follow-up idea</h4>
+                  <p>“How does this compare to a full-suspension option for rough trails?”</p>
+                </div>
+              </div>
+            </article>
+
+            <article class="preview-item" data-product="Trail Shoe">
+              <div class="workflow-lane">
+                <article class="pane pane-input">
+                  <h3>Input specs</h3>
+                  <p class="pane-kicker">Trail shoe</p>
+                  <p>“6mm drop • lug outsole • waterproof upper • reinforced toe”</p>
+                </article>
+                <article class="pane pane-output">
+                  <h3>Customer-ready explanation</h3>
+                  <p>“Grippy and stable trail shoe with weather protection and comfort for longer runs.”</p>
+                </article>
+              </div>
+              <div class="preview-footer">
+                <div>
+                  <h4>Study tools generated</h4>
+                  <p>Terrain vocabulary cards + Fit scenario practice + Objection quiz</p>
+                </div>
+                <div>
+                  <h4>Coach follow-up idea</h4>
+                  <p>“Would this feel too firm for runners coming from road shoes?”</p>
+                </div>
+              </div>
+            </article>
+
+            <article class="preview-item" data-product="Rain Jacket">
+              <div class="workflow-lane">
+                <article class="pane pane-input">
+                  <h3>Input specs</h3>
+                  <p class="pane-kicker">Rain jacket</p>
+                  <p>“3-layer shell • 20k waterproof • pit zips • taped seams”</p>
+                </article>
+                <article class="pane pane-output">
+                  <h3>Customer-ready explanation</h3>
+                  <p>“Storm-ready shell that blocks rain while still venting heat during active hikes.”</p>
+                </article>
+              </div>
+              <div class="preview-footer">
+                <div>
+                  <h4>Study tools generated</h4>
+                  <p>Feature translation cards + Activity matcher + Confidence check</p>
+                </div>
+                <div>
+                  <h4>Coach follow-up idea</h4>
+                  <p>“Is this better for daily commuting or technical alpine weather?”</p>
+                </div>
+              </div>
+            </article>
+
+            <article class="preview-item" data-product="Ski">
+              <div class="workflow-lane">
+                <article class="pane pane-input">
+                  <h3>Input specs</h3>
+                  <p class="pane-kicker">Ski</p>
+                  <p>“98mm waist • rocker-camber-rocker • poplar core • twin tip”</p>
+                </article>
+                <article class="pane pane-output">
+                  <h3>Customer-ready explanation</h3>
+                  <p>“Versatile all-mountain ski that feels playful in softer snow but still stable on groomers.”</p>
+                </article>
+              </div>
+              <div class="preview-footer">
+                <div>
+                  <h4>Study tools generated</h4>
+                  <p>Snow-condition flashcards + Terrain roleplay + End-of-shift quiz</p>
+                </div>
+                <div>
+                  <h4>Coach follow-up idea</h4>
+                  <p>“How approachable is this for an intermediate skier progressing off-piste?”</p>
+                </div>
               </div>
             </article>
           </div>
-          <div class="study-chip-row">
-            <span>Flashcards</span><span>Practice</span><span>Quiz</span><span>Coach</span>
-          </div>
         </aside>
-      </div>
-
-      <div class="container product-strip" aria-label="Sample products">
-        <p class="product-strip-label">Works with:</p>
-        <div>🚲 Bike</div>
-        <div>🥾 Trail Shoe</div>
-        <div>🧥 Rain Jacket</div>
-        <div>🎿 Ski</div>
       </div>
     </section>
 
-    <section class="section">
+    <section class="section reveal">
       <div class="container">
         <div class="section-head narrow">
-          <h2>Built for real retail training</h2>
-          <p>From first-day onboarding to advanced product conversations.</p>
+          <h2>Built for real retail moments</h2>
+          <p>When conversations are fast and products are technical, Gearbox helps every associate explain with clarity.</p>
         </div>
-
         <div class="feature-layout">
           <article class="card feature feature-main">
-            <h3>Product Explainer</h3>
-            <p>Translate technical specs into plain-language guidance your customers can understand quickly.</p>
+            <h3>What Gearbox does</h3>
+            <p>Turns product details into customer-ready language, then reinforces learning with practical training loops.</p>
             <ul>
-              <li>Clear tradeoff explanations</li>
-              <li>Beginner-friendly language</li>
-              <li>Comparison-ready talking points</li>
+              <li>Translates raw specs into plain language</li>
+              <li>Explains tradeoffs by customer need</li>
+              <li>Supports confident follow-up answers</li>
             </ul>
-            <a class="feature-link" href="explainer.html">Explore Explainer <span aria-hidden="true">→</span></a>
+            <a class="feature-link" href="explainer.html">Explore Product Explainer <span aria-hidden="true">→</span></a>
           </article>
 
           <div class="feature-stack">
             <article class="card feature">
-              <h3>Learn Mode</h3>
-              <p>Create flashcards, practice, and quiz modules in minutes.</p>
-              <a class="feature-link" href="learn.html">Open Learn Mode <span aria-hidden="true">→</span></a>
+              <h3>Why it matters</h3>
+              <p>Better product confidence leads to better customer trust, faster onboarding, and stronger conversion moments.</p>
             </article>
-
             <article class="card feature">
-              <h3>Gearbox Coach</h3>
-              <p>Ask follow-up questions when customers need deeper detail.</p>
-              <a class="feature-link" href="learn.html">Ask in Learn <span aria-hidden="true">→</span></a>
+              <h3>Where to start</h3>
+              <p>Start with one product and one real customer question, then practice the answer flow in Learn Mode.</p>
+              <a class="feature-link" href="learn.html">Open Learn Mode <span aria-hidden="true">→</span></a>
             </article>
           </div>
         </div>
       </div>
     </section>
 
-    <section class="section">
+    <section class="section reveal">
       <div class="container">
         <div class="section-head">
-          <h2>How it works</h2>
+          <h2>How Gearbox works</h2>
         </div>
         <div class="flow-steps">
-          <article class="step-card"><span>1</span><h4>Add product info</h4><p>Paste specs, a product link, or a product name.</p></article>
-          <article class="step-card"><span>2</span><h4>Generate clarity</h4><p>Create plain-language explanation or training content.</p></article>
-          <article class="step-card"><span>3</span><h4>Study the product</h4><p>Use flashcards, practice mode, and quizzes.</p></article>
-          <article class="step-card"><span>4</span><h4>Ask follow ups</h4><p>Use Gearbox Coach for objections and comparisons.</p></article>
+          <article class="step-card"><span>1</span><h4>Add product info</h4><p>Paste specs, product text, or a quick summary.</p></article>
+          <article class="step-card"><span>2</span><h4>Generate clarity</h4><p>Create plain-language explanations your team can use immediately.</p></article>
+          <article class="step-card"><span>3</span><h4>Train and retain</h4><p>Use flashcards, practice mode, and quizzes to build confidence.</p></article>
+          <article class="step-card"><span>4</span><h4>Coach follow-ups</h4><p>Handle objections, comparisons, and nuanced customer questions.</p></article>
         </div>
       </div>
     </section>
 
-    <section class="section compact">
+    <section class="section compact reveal">
       <div class="container">
         <article class="lookup-callout">
-          <h3>Don’t have specs?</h3>
-          <p>Smart Lookup beta can try to pull product details from a URL, then lets you review before generating.</p>
+          <h3>Why this is different from generic AI chat</h3>
+          <p>Gearbox is designed around retail training workflows, not just one-off answers—so teams can explain, practice, and improve consistently.</p>
+          <a class="inline-link" href="explainer.html">See the workflow in Product Explainer →</a>
         </article>
       </div>
     </section>
 
-    <section class="section final">
+    <section class="section final reveal">
       <div class="container">
         <article class="cta-panel">
-          <h2>Ready to test Gearbox with a real product?</h2>
-          <p>Start with a product link, pasted specs, or sample workflow.</p>
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="explainer.html">Try Product Explainer</a>
-            <a class="btn btn-secondary" href="learn.html">Open Learn Mode</a>
-          </div>
+          <h2>Ready to run a real product conversation?</h2>
+          <p>Start with your next product spec sheet and test how quickly Gearbox turns it into customer-ready guidance.</p>
+          <a class="btn btn-primary" href="explainer.html">Start with Product Explainer</a>
         </article>
       </div>
     </section>
@@ -169,53 +220,54 @@
   <script>
   (() => {
     const items = Array.from(document.querySelectorAll('.preview-item'));
+    const step = document.getElementById('workflowStep');
     if (items.length) {
       let index = 0;
       setInterval(() => {
         items[index].classList.remove('active');
         index = (index + 1) % items.length;
         items[index].classList.add('active');
-      }, 3200);
+        if (step) step.textContent = items[index].dataset.product || '';
+      }, 3400);
     }
 
     const title = document.getElementById('heroTitle');
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!title || reduced) return;
-
-    const tokenize = (txt) => txt.split(/(\s+)/).map((token) => {
-      if (!token.trim()) return token;
-      return `<span class="title-word">${[...token].map((ch) => `<span class="title-char">${ch}</span>`).join('')}</span>`;
-    }).join('');
-
-    const html = [...title.childNodes].map((n) => {
-      if (n.nodeType === Node.TEXT_NODE) return tokenize(n.textContent);
-      const cls = n.className || '';
-      return `<span class="${cls} title-word">${[...n.textContent].map((ch) => `<span class="title-char">${ch}</span>`).join('')}</span>`;
-    }).join('');
-    title.innerHTML = html;
-
-    const chars = Array.from(title.querySelectorAll('.title-char'));
-    title.addEventListener('pointermove', (e) => {
-      chars.forEach((el) => {
-        const r = el.getBoundingClientRect();
-        const cx = r.left + r.width / 2;
-        const cy = r.top + r.height / 2;
-        const d = Math.hypot(e.clientX - cx, e.clientY - cy);
-        const t = Math.max(0, 1 - d / 90);
-        el.style.setProperty('--char-scale', (1 + t * 0.14).toFixed(3));
-        el.style.setProperty('--char-lift', (t * 2.4).toFixed(2) + 'px');
-        el.style.setProperty('--char-glow', (0.18 + t * 0.72).toFixed(2));
+    if (title && !reduced) {
+      const words = Array.from(title.querySelectorAll('.hero-title-word'));
+      title.addEventListener('pointermove', (e) => {
+        words.forEach((word) => {
+          const r = word.getBoundingClientRect();
+          const cx = r.left + r.width / 2;
+          const cy = r.top + r.height / 2;
+          const d = Math.hypot(e.clientX - cx, e.clientY - cy);
+          const t = Math.max(0, 1 - d / 260);
+          word.style.setProperty('--word-lift', `${(t * 1.6).toFixed(2)}px`);
+          word.style.setProperty('--word-glow', (0.08 + t * 0.26).toFixed(2));
+        });
       });
-    });
-    title.addEventListener('pointerleave', () => {
-      chars.forEach((el) => {
-        el.style.removeProperty('--char-scale');
-        el.style.removeProperty('--char-lift');
-        el.style.removeProperty('--char-glow');
-      });
-    });
+      title.addEventListener('pointerleave', () => words.forEach((word) => {
+        word.style.removeProperty('--word-lift');
+        word.style.removeProperty('--word-glow');
+      }));
+    }
+
+    const reveals = Array.from(document.querySelectorAll('.reveal'));
+    if (!reduced && 'IntersectionObserver' in window) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      reveals.forEach((el) => io.observe(el));
+    } else {
+      reveals.forEach((el) => el.classList.add('revealed'));
+    }
   })();
-</script>
+  </script>
   <script src="script.js"></script>
 </body>
 </html>
