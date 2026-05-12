@@ -23,7 +23,11 @@
       <div class="container hero-grid">
         <div class="hero-copy">
           <p class="eyebrow">AI PRODUCT LEARNING FOR RETAIL TEAMS</p>
-          <h1 class="hero-title" id="heroTitle">Turn <span class="headline-glow">product specs</span> into <span class="headline-accent">confident</span> <span class="headline-glow">customer conversations.</span></h1>
+          <h1 class="hero-title" id="heroTitle">
+            <span class="hero-title-word">Turn product specs</span><br>
+            <span class="hero-title-word headline-accent">into confident</span><br>
+            <span class="hero-title-word">customer conversations.</span>
+          </h1>
           <p class="subtitle">Gearbox helps retail employees explain products clearly, practice with flashcards and quizzes, and answer customer follow ups with confidence.</p>
           <div class="hero-actions">
             <a class="btn btn-primary" href="explainer.html">Try Product Explainer</a>
@@ -182,36 +186,23 @@
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!title || reduced) return;
 
-    const tokenize = (txt) => txt.split(/(\s+)/).map((token) => {
-      if (!token.trim()) return token;
-      return `<span class="title-word">${[...token].map((ch) => `<span class="title-char">${ch}</span>`).join('')}</span>`;
-    }).join('');
-
-    const html = [...title.childNodes].map((n) => {
-      if (n.nodeType === Node.TEXT_NODE) return tokenize(n.textContent);
-      const cls = n.className || '';
-      return `<span class="${cls} title-word">${[...n.textContent].map((ch) => `<span class="title-char">${ch}</span>`).join('')}</span>`;
-    }).join('');
-    title.innerHTML = html;
-
-    const chars = Array.from(title.querySelectorAll('.title-char'));
+    const words = Array.from(title.querySelectorAll('.hero-title-word'));
     title.addEventListener('pointermove', (e) => {
-      chars.forEach((el) => {
-        const r = el.getBoundingClientRect();
+      words.forEach((word) => {
+        const r = word.getBoundingClientRect();
         const cx = r.left + r.width / 2;
         const cy = r.top + r.height / 2;
         const d = Math.hypot(e.clientX - cx, e.clientY - cy);
-        const t = Math.max(0, 1 - d / 90);
-        el.style.setProperty('--char-scale', (1 + t * 0.14).toFixed(3));
-        el.style.setProperty('--char-lift', (t * 2.4).toFixed(2) + 'px');
-        el.style.setProperty('--char-glow', (0.18 + t * 0.72).toFixed(2));
+        const t = Math.max(0, 1 - d / 240);
+        word.style.setProperty('--word-lift', `${(t * 1.5).toFixed(2)}px`);
+        word.style.setProperty('--word-glow', (0.08 + t * 0.2).toFixed(2));
       });
     });
+
     title.addEventListener('pointerleave', () => {
-      chars.forEach((el) => {
-        el.style.removeProperty('--char-scale');
-        el.style.removeProperty('--char-lift');
-        el.style.removeProperty('--char-glow');
+      words.forEach((word) => {
+        word.style.removeProperty('--word-lift');
+        word.style.removeProperty('--word-glow');
       });
     });
   })();
